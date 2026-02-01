@@ -1,55 +1,62 @@
 import React from 'react';
-import { Search, Calendar, CreditCard, Shield } from 'lucide-react';
+import { Search, Calendar, CreditCard, Shield, Zap, Heart, UserCheck, Smartphone } from 'lucide-react';
 
 const Features = () => {
     const features = [
         {
-            title: 'Find Doctors',
-            desc: 'Browse through our extensive list of verified specialists near you.',
-            icon: Search,
-            color: 'bg-blue-100 text-blue-600',
+            title: 'Expert Matching',
+            desc: 'Our AI finds the perfect specialist for your specific symptoms and history.',
+            icon: UserCheck,
+            color: 'bg-emerald-200 text-emerald-800',
+            gradient: 'from-emerald-100/80 to-emerald-50/30'
         },
         {
-            title: 'Quick Booking',
-            desc: 'Book your appointment in just a few clicks with instant confirmation.',
+            title: 'Instant Booking',
+            desc: 'Direct integration with doctor schedules means no more back-and-forth calls.',
             icon: Calendar,
-            color: 'bg-green-100 text-green-600',
+            color: 'bg-primary-200 text-primary-800',
+            gradient: 'from-primary-100/80 to-primary-50/30'
         },
         {
-            title: 'Secure Payments',
-            desc: 'Safe and encrypted payment processing for all your consultations.',
-            icon: CreditCard,
-            color: 'bg-purple-100 text-purple-600',
+            title: 'Digital Health',
+            desc: 'Access your prescriptions and medical history anywhere, anytime on any device.',
+            icon: Smartphone,
+            color: 'bg-accent-200 text-accent-800',
+            gradient: 'from-accent-100/80 to-accent-50/30'
         },
         {
-            title: 'Privacy First',
-            desc: 'All your medical records and data are encrypted and strictly confidential.',
+            title: 'Top Tier Security',
+            desc: 'Bank-grade encryption ensures your private data stays private.',
             icon: Shield,
-            color: 'bg-red-100 text-red-600',
+            color: 'bg-emerald-100 text-emerald-900',
+            gradient: 'from-emerald-200/40 to-emerald-50/20'
         },
     ];
 
     return (
-        <section className="py-24 bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
-                    <h2 className="text-base font-bold text-primary-600 tracking-wide uppercase">Core Features</h2>
-                    <p className="mt-2 text-4xl font-extrabold text-gray-900 sm:text-5xl">
-                        Everything you need for better health.
-                    </p>
+        <section className="py-24 bg-white relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div className="text-center mb-20">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 text-emerald-800 font-bold text-sm mb-4 uppercase tracking-widest border border-emerald-200">
+                        <Zap size={16} />
+                        Why Choose DoctorLink
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 font-display">
+                        Innovative Care. <span className="text-primary-700">Exceptional Results.</span>
+                    </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {features.map((feature, idx) => (
                         <div
                             key={idx}
-                            className="group p-8 rounded-3xl border border-gray-100 hover:border-primary-100 hover:shadow-2xl hover:shadow-primary-100 transition-all duration-300 transform hover:-translate-y-2"
+                            className={`group p-10 rounded-[2.5rem] bg-gradient-to-br ${feature.gradient} border border-white/50 hover:border-primary-200/50 transition-all duration-500 transform hover:-translate-y-2 hover:shadow-xl hover:shadow-primary-900/5`}
                         >
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${feature.color}`}>
-                                <feature.icon size={28} />
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-10 transition-transform group-hover:rotate-[15deg] shadow-sm ${feature.color}`}>
+                                <feature.icon size={32} />
                             </div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                            <p className="text-gray-600 leading-relaxed text-lg">{feature.desc}</p>
+                            <h3 className="text-2xl font-black text-gray-900 mb-4 font-display">{feature.title}</h3>
+                            <p className="text-gray-700 leading-relaxed text-lg font-bold opacity-80">{feature.desc}</p>
                         </div>
                     ))}
                 </div>

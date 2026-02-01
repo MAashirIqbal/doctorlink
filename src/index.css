@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Emerald Wellness Palette */
+  /* Emerald Wellness Palette - High Contrast */
   --color-primary-50: #f0fdf4;
   --color-primary-100: #dcfce7;
   --color-primary-200: #bbf7d0;
@@ -9,23 +9,23 @@
   --color-primary-400: #4ade80;
   --color-primary-500: #22c55e;
   --color-primary-600: #16a34a;
-  --color-primary-700: #15803d;
+  --color-primary-700: #15803d; /* Darker green for primary buttons */
   --color-primary-800: #166534;
   --color-primary-900: #14532d;
   --color-primary-950: #064e3b;
 
-  /* Secondary Accents (Gold/Cream) */
+  /* Secondary Accents - Deepened */
   --color-accent-50: #fffbeb;
   --color-accent-100: #fef3c7;
-  --color-accent-500: #d97706; /* Goldish */
+  --color-accent-500: #d97706; 
   --color-accent-600: #b45309;
 }
 
 :root {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
-  color: #1f2937;
+  font-weight: 500; /* Increased from 400 for better readability */
+  color: #111827; /* Darker slate-900 for text */
   background-color: #ffffff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -33,13 +33,14 @@
 
 h1, h2, h3, h4, .font-display {
   font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.01em;
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.85); /* Increased opacity */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 body {
@@ -47,5 +48,5 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #fafafa;
+  background-color: #ffffff;
 }
