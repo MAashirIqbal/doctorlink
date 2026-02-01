@@ -41,26 +41,26 @@ const FAQ = () => {
                     {faqs.map((faq, i) => (
                         <div
                             key={i}
-                            className={`rounded-[2rem] border transition-all duration-300 ${openIdx === i
-                                    ? 'bg-primary-50/50 border-primary-200'
-                                    : 'bg-white border-gray-100 hover:border-primary-100'
+                            className={`rounded-3xl border transition-all duration-300 ${openIdx === i
+                                    ? 'bg-primary-50/50 border-primary-200 shadow-sm'
+                                    : 'bg-[#fafafa] border-gray-100 hover:border-primary-100'
                                 }`}
                         >
                             <button
                                 onClick={() => setOpenIdx(openIdx === i ? -1 : i)}
-                                className="w-full px-8 py-6 flex items-center justify-between text-left"
+                                className="w-full px-8 py-6 flex items-center justify-between text-left group"
                             >
-                                <span className={`text-xl font-black ${openIdx === i ? 'text-primary-800' : 'text-gray-900'}`}>
+                                <span className={`text-xl font-black transition-colors ${openIdx === i ? 'text-primary-800' : 'text-gray-900'}`}>
                                     {faq.q}
                                 </span>
-                                <div className={`p-2 rounded-full transition-colors ${openIdx === i ? 'bg-primary-600 text-white' : 'bg-gray-50 text-gray-400'}`}>
+                                <div className={`p-2 rounded-xl transition-all ${openIdx === i ? 'bg-primary-700 text-white rotate-0' : 'bg-white text-gray-400 border border-gray-100'}`}>
                                     {openIdx === i ? <Minus size={20} /> : <Plus size={20} />}
                                 </div>
                             </button>
 
                             {openIdx === i && (
                                 <div className="px-8 pb-8 animate-in fade-in slide-in-from-top-2 duration-300">
-                                    <p className="text-gray-600 text-lg font-bold leading-relaxed opacity-80">
+                                    <p className="text-gray-700 text-lg font-bold leading-relaxed opacity-75">
                                         {faq.a}
                                     </p>
                                 </div>

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Activity, Instagram, Twitter, Linkedin, Facebook, MapPin, Phone, Mail, ArrowRight, Heart } from 'lucide-react';
+import { Activity, Instagram, Twitter, Linkedin, Facebook, MapPin, Phone, Mail, ArrowRight, Heart, ShieldCheck, Lock, CheckCircle } from 'lucide-react';
 
 const Footer = () => {
     return (
-        <footer className="bg-white border-t border-gray-100 pt-24 pb-12 relative">
+        <footer className="bg-white border-t border-gray-100 pt-24 pb-12 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
                     {/* Brand Column */}
@@ -20,6 +20,19 @@ const Footer = () => {
                         <p className="text-gray-600 font-bold leading-relaxed opacity-70">
                             The future of healthcare is digital. We connect you with verified specialists instantly.
                         </p>
+
+                        {/* Trust Badges - Improved Professionalism */}
+                        <div className="flex gap-4 pt-2">
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-100">
+                                <ShieldCheck size={14} className="text-emerald-700" />
+                                <span className="text-[10px] font-black text-emerald-800 uppercase tracking-wider leading-none">HIPAA Compliant</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 rounded-lg border border-primary-100">
+                                <Lock size={14} className="text-primary-700" />
+                                <span className="text-[10px] font-black text-primary-800 uppercase tracking-wider leading-none">Encrypted</span>
+                            </div>
+                        </div>
+
                         <div className="flex gap-3">
                             {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
                                 <a key={i} href="#" className="w-10 h-10 bg-gray-50 border border-gray-100 text-gray-400 hover:text-primary-700 hover:bg-primary-50 hover:border-primary-100 rounded-xl flex items-center justify-center transition-all">
@@ -35,7 +48,7 @@ const Footer = () => {
                         <ul className="space-y-4">
                             {['Find Specialists', 'Online Visit', 'Prescriptions', 'Emergency Care', 'Health Plans'].map((item) => (
                                 <li key={item}>
-                                    <a href="#" className="text-gray-600 font-bold opacity-70 hover:opacity-100 hover:text-primary-700 transition-all flex items-center gap-2 group">
+                                    <a href="#" className="text-gray-600 font-bold opacity-70 hover:opacity-100 hover:text-primary-700 transition-all flex items-center gap-2">
                                         {item}
                                     </a>
                                 </li>
@@ -57,15 +70,18 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Integrated CTA in Footer */}
-                    <div className="bg-emerald-50/50 p-8 rounded-[2.5rem] border border-emerald-100/50">
-                        <h4 className="text-xl font-black mb-4 font-display text-gray-900">Get Health Alerts</h4>
-                        <p className="text-gray-600 font-bold text-sm mb-6 opacity-70">Stay updated with latest medical trends.</p>
-                        <div className="relative">
+                    {/* Integrated CTA - Standardized Radius */}
+                    <div className="bg-emerald-50/50 p-8 rounded-3xl border border-emerald-100/50 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-10">
+                            <CheckCircle size={80} className="text-emerald-700" />
+                        </div>
+                        <h4 className="text-xl font-black mb-4 font-display text-gray-900 relative z-10">Health Alerts</h4>
+                        <p className="text-gray-600 font-bold text-sm mb-6 opacity-70 relative z-10">Stay updated with latest medical trends.</p>
+                        <div className="relative z-10">
                             <input
                                 type="email"
                                 placeholder="Email"
-                                className="w-full bg-white border border-emerald-100 rounded-2xl py-3.5 px-5 outline-none focus:border-primary-600 transition-all font-bold text-gray-900 shadow-sm"
+                                className="w-full bg-white border border-emerald-100 rounded-xl py-3.5 px-5 outline-none focus:border-primary-700 transition-all font-bold text-gray-900 shadow-sm"
                             />
                             <button className="absolute right-1.5 top-1.5 bottom-1.5 bg-primary-700 hover:bg-primary-800 text-white px-3 rounded-xl transition-all shadow-lg shadow-primary-700/30">
                                 <ArrowRight size={18} />
@@ -76,7 +92,7 @@ const Footer = () => {
 
                 {/* Bottom Bar */}
                 <div className="pt-12 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-2 text-gray-400 font-bold text-sm">
+                    <div className="flex items-center gap-2 text-gray-400 font-bold text-sm uppercase tracking-widest">
                         <span>© 2026 DoctorLink Healthcare</span>
                         <div className="w-1 h-1 bg-gray-200 rounded-full" />
                         <span>FYP Project</span>

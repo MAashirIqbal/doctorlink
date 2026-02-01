@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Activity } from 'lucide-react';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
+            setIsScrolled(window.scrollY > 10);
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -24,17 +25,17 @@ const Navbar = () => {
     return (
         <nav
             className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled
-                    ? 'bg-white shadow-md py-2 border-b border-gray-100'
-                    : 'bg-white/90 backdrop-blur-sm py-4 border-b border-transparent'
+                ? 'bg-white shadow-sm py-2.5 border-b border-gray-100'
+                : 'bg-transparent py-5'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center">
                     <Link to="/" className="flex items-center gap-2 group">
-                        <div className="bg-primary-700 p-2 rounded-lg group-hover:scale-110 transition-transform shadow-sm">
-                            <Activity className="text-white w-6 h-6" />
+                        <div className="bg-primary-700 p-2 rounded-xl group-hover:scale-110 transition-transform shadow-sm">
+                            <Activity className="text-white w-5 h-5" />
                         </div>
-                        <span className="text-2xl font-black text-gray-900 tracking-tight">
+                        <span className="text-xl font-black text-gray-900 tracking-tight font-display">
                             Doctor<span className="text-primary-700">Link</span>
                         </span>
                     </Link>
@@ -45,14 +46,15 @@ const Navbar = () => {
                             <Link
                                 key={link.name}
                                 to={link.path}
-                                className="text-gray-800 hover:text-primary-700 font-bold transition-colors text-[15px]"
+                                className={`text-[15px] font-bold transition-all hover:text-primary-700 ${location.pathname === link.path ? 'text-primary-700' : 'text-gray-800'
+                                    } hover:scale-105`}
                             >
                                 {link.name}
                             </Link>
                         ))}
                         <Link
                             to="/login"
-                            className="bg-primary-700 hover:bg-primary-800 text-white px-7 py-2.5 rounded-full font-bold transition-all hover:shadow-lg active:scale-95"
+                            className="bg-primary-700 hover:bg-primary-800 text-white px-6 py-2.5 rounded-2xl font-black text-sm transition-all hover:shadow-lg active:scale-95 shadow-primary-700/10"
                         >
                             Get Started
                         </Link>
@@ -62,9 +64,9 @@ const Navbar = () => {
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
                         >
-                            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
                     </div>
                 </div>
@@ -78,7 +80,7 @@ const Navbar = () => {
                             <Link
                                 key={link.name}
                                 to={link.path}
-                                className="block px-4 py-4 text-lg font-bold text-gray-900 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors"
+                                className="block px-4 py-4 text-lg font-black text-gray-900 hover:bg-primary-50 hover:text-primary-700 rounded-2xl transition-all"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 {link.name}
@@ -86,7 +88,7 @@ const Navbar = () => {
                         ))}
                         <Link
                             to="/login"
-                            className="block w-full text-center mt-4 bg-primary-700 text-white px-6 py-4 rounded-xl font-bold text-lg"
+                            className="block w-full text-center mt-4 bg-primary-700 text-white px-6 py-4 rounded-2xl font-black text-lg"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
                             Get Started
