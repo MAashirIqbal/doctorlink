@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Activity, PhoneCall } from 'lucide-react';
+import { Menu, X, Activity } from 'lucide-react';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -16,72 +16,53 @@ const Navbar = () => {
 
     const navLinks = [
         { name: 'Home', path: '/' },
-        { name: 'Specialists', path: '/doctors' },
-        { name: 'Clinics', path: '/about' },
-        { name: 'Services', path: '/contact' },
+        { name: 'Doctors', path: '/doctors' },
+        { name: 'About', path: '/about' },
+        { name: 'Contact', path: '/contact' },
     ];
 
     return (
         <nav
-            className={`fixed top-0 w-full z-[100] transition-all duration-500 ${isScrolled
-                    ? 'bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 py-3'
-                    : 'bg-transparent py-5'
+            className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-4'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center">
-                    {/* Brand */}
-                    <Link to="/" className="flex items-center gap-2.5 group">
-                        <div className="bg-primary-600 p-2 rounded-xl group-hover:rotate-[15deg] transition-all duration-300 shadow-lg shadow-primary-600/20">
+                    <Link to="/" className="flex items-center gap-2 group">
+                        <div className="bg-primary-600 p-2 rounded-lg group-hover:scale-110 transition-transform">
                             <Activity className="text-white w-6 h-6" />
                         </div>
-                        <span className="text-2xl font-black tracking-tight text-gray-900 font-display">
-                            Doctor<span className="text-primary-600 underline decoration-emerald-200 decoration-4 underline-offset-4">Link</span>
+                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-emerald-500">
+                            DoctorLink
                         </span>
                     </Link>
 
                     {/* Desktop Nav */}
-                    <div className="hidden md:flex items-center gap-10">
-                        <div className="flex items-center gap-8">
-                            {navLinks.map((link) => (
-                                <Link
-                                    key={link.name}
-                                    to={link.path}
-                                    className="text-[15px] font-bold text-gray-600 hover:text-primary-600 transition-colors tracking-wide"
-                                >
-                                    {link.name}
-                                </Link>
-                            ))}
-                        </div>
-
-                        <div className="h-6 w-[1px] bg-gray-200" />
-
-                        <div className="flex items-center gap-4">
-                            <div className="hidden xl:flex items-center gap-3 mr-2">
-                                <div className="p-2 bg-emerald-50 rounded-full">
-                                    <PhoneCall className="text-primary-600 w-4 h-4" />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Emergency</p>
-                                    <p className="text-sm font-black text-gray-900 leading-none">+1 800 555 123</p>
-                                </div>
-                            </div>
+                    <div className="hidden md:flex items-center gap-8">
+                        {navLinks.map((link) => (
                             <Link
-                                to="/login"
-                                className="bg-primary-950 hover:bg-black text-white px-7 py-3 rounded-full font-bold text-[15px] transition-all active:scale-95 shadow-xl shadow-gray-200"
+                                key={link.name}
+                                to={link.path}
+                                className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
                             >
-                                Get Started
+                                {link.name}
                             </Link>
-                        </div>
+                        ))}
+                        <Link
+                            to="/login"
+                            className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all hover:shadow-lg active:scale-95"
+                        >
+                            Get Started
+                        </Link>
                     </div>
 
                     {/* Mobile Menu Toggle */}
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="p-2 text-gray-900 bg-gray-50 rounded-lg"
+                            className="p-2 text-gray-700"
                         >
-                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
                         </button>
                     </div>
                 </div>
@@ -89,13 +70,13 @@ const Navbar = () => {
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-                <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-2xl border-t border-gray-50 p-6 animate-in slide-in-from-top duration-300">
-                    <div className="space-y-4">
+                <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl animate-in slide-in-from-top duration-300">
+                    <div className="px-4 pt-2 pb-6 space-y-1">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.name}
                                 to={link.path}
-                                className="block text-lg font-bold text-gray-900 border-b border-gray-50 pb-4"
+                                className="block px-3 py-4 text-base font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-lg transition-colors"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 {link.name}
@@ -103,7 +84,7 @@ const Navbar = () => {
                         ))}
                         <Link
                             to="/login"
-                            className="block w-full text-center bg-primary-600 text-white py-4 rounded-2xl font-bold text-lg"
+                            className="block w-full text-center mt-4 bg-primary-600 text-white px-6 py-3 rounded-xl font-bold"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
                             Get Started
