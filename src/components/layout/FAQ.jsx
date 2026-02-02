@@ -42,8 +42,8 @@ const FAQ = () => {
                         <div
                             key={i}
                             className={`rounded-3xl border transition-all duration-300 ${openIdx === i
-                                    ? 'bg-primary-50/50 border-primary-200 shadow-sm'
-                                    : 'bg-[#fafafa] border-gray-100 hover:border-primary-100'
+                                ? 'bg-primary-50/50 border-primary-200 shadow-sm'
+                                : 'bg-[#fafafa] border-gray-100 hover:border-primary-100'
                                 }`}
                         >
                             <button
