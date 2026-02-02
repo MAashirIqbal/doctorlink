@@ -79,7 +79,14 @@ const AboutSection = () => {
                                 { title: 'Secure Video Calls', desc: 'Encrypted HD video consultations from any location.' },
                                 { title: 'Instant Prescriptions', desc: 'Received digital prescriptions immediately after your visit.' }
                             ].map((item, id) => (
-                                <li key={id} className="flex items-start gap-4 group">
+                                <motion.li
+                                    key={id}
+                                    initial={{ opacity: 0, x: 20 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.3 + (id * 0.1) }}
+                                    className="flex items-start gap-4 group"
+                                >
                                     <div className="mt-1">
                                         <CheckCircle2 className="text-primary-700 group-hover:scale-110 transition-transform" size={26} />
                                     </div>
@@ -87,7 +94,7 @@ const AboutSection = () => {
                                         <h4 className="text-xl font-black text-gray-900 leading-tight mb-1">{item.title}</h4>
                                         <p className="text-gray-500 font-bold opacity-80">{item.desc}</p>
                                     </div>
-                                </li>
+                                </motion.li>
                             ))}
                         </ul>
 
