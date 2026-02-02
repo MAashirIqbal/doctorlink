@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Star, Clock, ShieldCheck, User, Activity } from 'lucide-react';
+import { ArrowRight, Star, Clock, ShieldCheck, User, CalendarCheck } from 'lucide-react';
 import heroImage from '../../assets/doctor_hero_new.png';
 
 const FloatingCard = ({ children, className, delay = 0 }) => (
@@ -104,18 +104,18 @@ const Hero = () => {
                         >
                             <div className="bg-white/80 backdrop-blur-xl p-5 rounded-3xl shadow-xl shadow-gray-200/50 border border-white/50 flex items-center gap-4">
                                 <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                                    <Activity className="text-emerald-700" size={24} />
+                                    <CalendarCheck className="text-emerald-700" size={24} />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-black text-gray-900 leading-none">Live Analytics</p>
-                                    <p className="text-[10px] text-emerald-600 font-bold mt-1.5 uppercase tracking-wider">Health Monitoring</p>
+                                    <p className="text-sm font-black text-gray-900 leading-none">Flexible Booking</p>
+                                    <p className="text-[10px] text-emerald-600 font-bold mt-1.5 uppercase tracking-wider">Easy Rescheduling</p>
                                 </div>
                             </div>
                         </FloatingCard>
 
                         {/* Rating Card */}
                         <FloatingCard
-                            className="bottom-20 -right-8 lg:-right-12"
+                            className="bottom-20 -right-4 sm:-right-6 lg:-right-8"
                             delay={0.5}
                         >
                             <div className="bg-primary-950/95 backdrop-blur-xl p-6 rounded-[2rem] shadow-2xl shadow-primary-900/20 border border-primary-800 flex flex-col gap-3 text-white">
