@@ -189,7 +189,7 @@ const Auth = () => {
                     <motion.div
                         initial={false}
                         animate={{
-                            x: isLogin ? '100%' : '0%',
+                            x: isLogin ? '99%' : '-1%',
                             rotateY: isLogin ? -10 : 10,
                         }}
                         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -197,7 +197,7 @@ const Auth = () => {
                             backfaceVisibility: 'hidden',
                             willChange: 'transform'
                         }}
-                        className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-br from-emerald-600 to-emerald-950 z-30 shadow-[-50px_0_100px_-20px_rgba(0,0,0,0.5)] origin-center flex items-center justify-center overflow-hidden"
+                        className="absolute top-0 left-0 w-[51%] h-full bg-gradient-to-br from-emerald-600 to-emerald-950 z-30 shadow-[-50px_0_100px_-20px_rgba(0,0,0,0.5),0_0_0_1px_rgba(16,185,129,0.2)] origin-center flex items-center justify-center overflow-hidden"
                     >
                         {/* Decorative Background for Overlay */}
                         <div className="absolute inset-0 z-0">
