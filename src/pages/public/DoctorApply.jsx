@@ -293,7 +293,6 @@ const DoctorApply = () => {
                                             <button onClick={() => setStep(2)} className="flex-1 bg-white/5 py-4 rounded-2xl text-white/50 font-black hover:bg-white/10 transition-all italic tracking-[0.2em] uppercase text-xs">Back</button>
                                             <button className="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-emerald-500 transition-all active:scale-[0.98] shadow-xl shadow-emerald-950/40 text-lg">
                                                 Submit Profile
-                                                <Sparkles size={18} />
                                             </button>
                                         </div>
                                     </motion.div>
