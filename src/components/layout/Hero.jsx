@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Star, Clock, ShieldCheck, User, CalendarCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import heroImage from '../../assets/doctor_hero_new.png';
 
 const FloatingCard = ({ children, className, delay = 0 }) => (
@@ -55,13 +56,13 @@ const Hero = () => {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 mb-14">
-                            <button className="flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-primary-700/20">
+                            <Link to="/register" className="flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-primary-700/20">
                                 Find a Specialist
                                 <ArrowRight size={22} />
-                            </button>
-                            <button className="flex items-center justify-center gap-2 bg-white border-2 border-gray-100 text-gray-900 hover:border-primary-200 px-10 py-5 rounded-2xl font-black text-lg transition-all">
+                            </Link>
+                            <Link to="/apply-doctor" className="flex items-center justify-center gap-2 bg-white border-2 border-gray-100 text-gray-900 hover:border-primary-200 px-10 py-5 rounded-2xl font-black text-lg transition-all text-center">
                                 For Providers
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Quick Trust Stats */}

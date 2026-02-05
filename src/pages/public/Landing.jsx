@@ -7,6 +7,7 @@ import AboutSection from '../../components/layout/AboutSection';
 import Testimonials from '../../components/layout/Testimonials';
 import FAQ from '../../components/layout/FAQ';
 import Footer from '../../components/layout/Footer';
+import { Link } from 'react-router-dom';
 
 const Landing = () => {
     return (
@@ -40,12 +41,12 @@ const Landing = () => {
                             Experience the difference with DoctorLink. Professional care is just a few clicks away. Join the thousands who trust us.
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-6">
-                            <button className="bg-primary-700 hover:bg-primary-800 text-white px-12 py-5 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-primary-700/30">
+                            <Link to="/register" className="bg-primary-700 hover:bg-primary-800 text-white px-12 py-5 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-primary-700/30">
                                 Register as Patient
-                            </button>
-                            <button className="bg-white text-gray-900 border-2 border-gray-100 hover:border-primary-200 px-12 py-5 rounded-2xl font-black text-xl transition-all">
+                            </Link>
+                            <Link to="/apply-doctor" className="bg-white text-gray-900 border-2 border-gray-100 hover:border-primary-200 px-12 py-5 rounded-2xl font-black text-xl transition-all text-center">
                                 Join as Specialist
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </section>
