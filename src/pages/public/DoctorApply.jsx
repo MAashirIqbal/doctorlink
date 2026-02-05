@@ -147,23 +147,23 @@ const DoctorApply = () => {
 
             {/* Main 3D Container */}
             <motion.div
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative w-full max-w-6xl h-[780px] z-10 perspective-2000"
+                className="relative w-full max-w-5xl h-[700px] z-10 perspective-2000"
             >
                 {/* The Master Card */}
-                <div className="absolute inset-0 bg-[#0a1a15]/80 backdrop-blur-3xl rounded-[40px] border border-white/10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8)] flex overflow-hidden">
+                <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl rounded-[40px] border border-white/10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] flex overflow-hidden">
 
                     {/* Left Side: Provider Login Form */}
                     <div className="w-1/2 p-12 lg:p-16 flex flex-col justify-center relative">
                         <motion.div
                             animate={{
                                 opacity: isLogin ? 1 : 0,
-                                x: isLogin ? 0 : -50,
-                                scale: isLogin ? 1 : 0.9,
+                                x: isLogin ? 0 : -20,
+                                scale: isLogin ? 1 : 0.95,
                                 pointerEvents: isLogin ? 'auto' : 'none'
                             }}
-                            transition={{ duration: 0.6, ease: "easeOut" }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="w-full"
                         >
                             <h2 className="text-4xl font-black text-white mb-2 tracking-tighter uppercase italic underline decoration-emerald-500/50 underline-offset-8">Sign In</h2>
@@ -201,11 +201,11 @@ const DoctorApply = () => {
                         <motion.div
                             animate={{
                                 opacity: !isLogin ? 1 : 0,
-                                x: !isLogin ? 0 : 50,
-                                scale: !isLogin ? 1 : 0.9,
+                                x: !isLogin ? 0 : 20,
+                                scale: !isLogin ? 1 : 0.95,
                                 pointerEvents: !isLogin ? 'auto' : 'none'
                             }}
-                            transition={{ duration: 0.6, ease: "easeOut" }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="w-full"
                         >
                             <AnimatePresence mode="wait">
@@ -303,12 +303,17 @@ const DoctorApply = () => {
 
                     {/* The 3D Sliding Overlay */}
                     <motion.div
+                        initial={false}
                         animate={{
-                            x: isLogin ? '100.2%' : '0%',
-                            rotateY: isLogin ? 5 : -5
+                            x: isLogin ? '99%' : '-1%',
+                            rotateY: isLogin ? -10 : 10
                         }}
                         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                        className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-br from-emerald-600 to-[#063b2a] z-50 flex flex-col items-center justify-center p-12 text-center shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden"
+                        style={{
+                            backfaceVisibility: 'hidden',
+                            willChange: 'transform'
+                        }}
+                        className="absolute top-0 left-0 w-[51%] h-full bg-gradient-to-br from-emerald-600 to-emerald-950 z-30 flex flex-col items-center justify-center p-12 text-center shadow-[-50px_0_100px_-20px_rgba(0,0,0,0.5),0_0_0_1px_rgba(16,185,129,0.2)]"
                     >
                         {/* High-Fidelity Pulse Decoration */}
                         <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -348,9 +353,11 @@ const DoctorApply = () => {
                     </motion.div>
                 </div>
 
-                {/* Return Home */}
-                <Link to="/" className="absolute -bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white/20 hover:text-emerald-400 transition-all font-black text-xs tracking-[0.4em] group uppercase scale-90">
-                    <motion.div whileHover={{ x: -10 }}>← Exit to Public Domain</motion.div>
+                {/* Return Home Link */}
+                <Link to="/" className="absolute -bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white/30 hover:text-emerald-400 transition-all font-black text-sm group">
+                    <motion.div whileHover={{ x: -5 }} className="flex items-center gap-2">
+                        ← Back to Home
+                    </motion.div>
                 </Link>
             </motion.div>
 

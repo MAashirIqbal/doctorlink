@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, User, ArrowRight, Stethoscope, Sparkles } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Activity } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Auth = () => {
@@ -237,14 +237,7 @@ const Auth = () => {
                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                 className="w-32 h-32 bg-white/10 rounded-[35%] flex items-center justify-center mb-8 backdrop-blur-xl border border-white/20 shadow-2xl relative"
                             >
-                                <Stethoscope size={64} className="text-white" strokeWidth={1.5} />
-                                <motion.div
-                                    animate={{ opacity: [0.3, 0.6, 0.3] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                    className="absolute -top-4 -right-4"
-                                >
-                                    <Sparkles className="text-emerald-300" size={32} />
-                                </motion.div>
+                                <Activity size={64} className="text-white" strokeWidth={1.5} />
                             </motion.div>
 
                             <AnimatePresence mode="wait">
