@@ -4,9 +4,9 @@ import { Activity, Instagram, Twitter, Linkedin, Facebook, MapPin, Phone, Mail, 
 
 const Footer = () => {
     return (
-        <footer className="bg-white border-t border-gray-100 pt-24 pb-12 relative overflow-hidden">
+        <footer className="bg-white border-t border-gray-100 pt-16 pb-8 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-12">
                     {/* Brand Column */}
                     <div className="space-y-6">
                         <Link to="/" className="flex items-center gap-2.5">
@@ -44,9 +44,9 @@ const Footer = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="text-lg font-black mb-8 font-display text-gray-900">Services</h4>
+                        <h4 className="text-lg font-black mb-8 font-display text-gray-900 uppercase tracking-widest">Platform</h4>
                         <ul className="space-y-4">
-                            {['Find Specialists', 'Online Visit', 'Prescriptions', 'Emergency Care', 'Health Plans'].map((item) => (
+                            {['Find Specialists', 'AI Symptom Analyzer', 'Specialist Portal', 'Patient Dashboard'].map((item) => (
                                 <li key={item}>
                                     <a href="#" className="text-gray-600 font-bold opacity-70 hover:opacity-100 hover:text-primary-700 transition-all flex items-center gap-2">
                                         {item}
@@ -58,9 +58,9 @@ const Footer = () => {
 
                     {/* Support */}
                     <div>
-                        <h4 className="text-lg font-black mb-8 font-display text-gray-900">Company</h4>
+                        <h4 className="text-lg font-black mb-8 font-display text-gray-900 uppercase tracking-widest">Support</h4>
                         <ul className="space-y-4">
-                            {['About Us', 'Safety First', 'How it Works', 'Privacy Policy', 'Contact Support'].map((item) => (
+                            {['About Us', 'Safety Protocols', 'How it Works', 'Privacy Policy'].map((item) => (
                                 <li key={item}>
                                     <a href="#" className="text-gray-600 font-bold opacity-70 hover:opacity-100 hover:text-primary-700 transition-all flex items-center gap-2">
                                         {item}
@@ -70,35 +70,28 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Integrated CTA - Standardized Radius */}
-                    <div className="bg-emerald-50/50 p-8 rounded-3xl border border-emerald-100/50 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
-                            <CheckCircle size={80} className="text-emerald-700" />
-                        </div>
-                        <h4 className="text-xl font-black mb-4 font-display text-gray-900 relative z-10">Health Alerts</h4>
-                        <p className="text-gray-600 font-bold text-sm mb-6 opacity-70 relative z-10">Stay updated with latest medical trends.</p>
-                        <div className="relative z-10">
-                            <input
-                                type="email"
-                                placeholder="Email"
-                                className="w-full bg-white border border-emerald-100 rounded-xl py-3.5 px-5 outline-none focus:border-primary-700 transition-all font-bold text-gray-900 shadow-sm"
-                            />
-                            <button className="absolute right-1.5 top-1.5 bottom-1.5 bg-primary-700 hover:bg-primary-800 text-white px-3 rounded-xl transition-all shadow-lg shadow-primary-700/30">
-                                <ArrowRight size={18} />
-                            </button>
+                    {/* Contact Info */}
+                    <div className="space-y-6">
+                        <h4 className="text-lg font-black mb-8 font-display text-gray-900 uppercase tracking-widest">Contact</h4>
+                        <div className="space-y-4 text-gray-600 font-bold opacity-70 italic text-sm">
+                            <div className="flex items-center gap-3">
+                                <Phone size={16} className="text-primary-700" />
+                                <span>+92 3XX XXXXXXX</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Mail size={16} className="text-primary-700" />
+                                <span>support@doctorlink.pk</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="pt-12 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-2 text-gray-400 font-bold text-sm uppercase tracking-widest">
-                        <span>© 2026 DoctorLink Healthcare</span>
-                        <div className="w-1 h-1 bg-gray-200 rounded-full" />
-                        <span>FYP Project</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-400 font-bold text-sm">
-                        Made with <Heart size={14} className="text-rose-400 fill-rose-400" /> by Antigravity
+                {/* Bottom Bar - Centered & Clean */}
+                <div className="pt-8 border-t border-gray-100 flex justify-center text-center">
+                    <div className="flex items-center gap-2 text-gray-400 font-black text-xs uppercase tracking-[0.4em]">
+                        <span>© 2026 DOCTORLINK HEALTHCARE</span>
+                        <div className="w-1.5 h-1.5 bg-emerald-500/30 rounded-full animate-pulse" />
+                        <span>FINAL YEAR UNIVERSITY PROJECT</span>
                     </div>
                 </div>
             </div>
