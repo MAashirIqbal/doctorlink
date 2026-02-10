@@ -4,29 +4,29 @@ import { Search, Calendar, CreditCard, Shield, Zap, Heart, UserCheck, Smartphone
 const Features = () => {
     const features = [
         {
-            title: 'Expert Matching',
-            desc: 'Our AI finds the perfect specialist for your specific symptoms and history.',
+            title: 'Verified Doctors',
+            desc: 'Every doctor is PMC-verified and admin-approved before appearing on the platform.',
             icon: UserCheck,
             color: 'bg-emerald-200 text-emerald-800',
             gradient: 'from-emerald-100/80 to-emerald-50/30'
         },
         {
             title: 'Instant Booking',
-            desc: 'Direct integration with doctor schedules means no more back-and-forth calls.',
+            desc: 'Book in-person appointments directly from real-time doctor schedules — no phone calls needed.',
             icon: Calendar,
             color: 'bg-primary-200 text-primary-800',
             gradient: 'from-primary-100/80 to-primary-50/30'
         },
         {
-            title: 'Digital Health',
-            desc: 'Access your prescriptions and medical history anywhere, anytime on any device.',
-            icon: Smartphone,
+            title: 'Secure Payments',
+            desc: 'Pay online via Stripe with transparent fee breakdowns and instant confirmation.',
+            icon: CreditCard,
             color: 'bg-accent-200 text-accent-800',
             gradient: 'from-accent-100/80 to-accent-50/30'
         },
         {
             title: 'Top Tier Security',
-            desc: 'Bank-grade encryption ensures your private data stays private.',
+            desc: 'Bank-grade encryption keeps your personal and medical data fully private.',
             icon: Shield,
             color: 'bg-emerald-100 text-emerald-900',
             gradient: 'from-emerald-200/40 to-emerald-50/20'

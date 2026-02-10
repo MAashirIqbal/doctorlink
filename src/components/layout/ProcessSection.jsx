@@ -23,12 +23,12 @@ const ProcessSection = () => {
         },
         {
             id: '03',
-            title: 'Get Consultation',
-            desc: 'Meet your doctor via secure video or in-person visit.',
+            title: 'Visit Your Doctor',
+            desc: 'Attend your confirmed appointment at the doctor\'s clinic hassle-free.',
             icon: ClipboardCheck,
             iconColor: 'text-accent-600',
             borderColor: 'border-accent-100',
-            link: 'Start visit'
+            link: 'Get started'
         }
     ];
 

@@ -76,8 +76,8 @@ const AboutSection = () => {
                         <ul className="space-y-6">
                             {[
                                 { title: 'No Registration Fees', desc: 'Patients can join and browse doctors for free.' },
-                                { title: 'Secure Video Calls', desc: 'Encrypted HD video consultations from any location.' },
-                                { title: 'Instant Prescriptions', desc: 'Received digital prescriptions immediately after your visit.' }
+                                { title: 'Real-Time Scheduling', desc: 'Book available slots directly from doctor calendars — no waiting or phone calls.' },
+                                { title: 'Smart Notifications', desc: 'Get appointment reminders, booking confirmations, and status updates instantly.' }
                             ].map((item, id) => (
                                 <motion.li
                                     key={id}
