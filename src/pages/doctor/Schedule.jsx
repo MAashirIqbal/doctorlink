@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Calendar, Clock, User, Activity, LogOut,
@@ -31,6 +32,7 @@ const normalizeSlot = (slot) => {
 
 const DoctorSchedule = () => {
     const { user, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const [isSaved, setIsSaved] = useState(false);
     const [slotDuration, setSlotDuration] = useState(30);
@@ -111,7 +113,7 @@ const DoctorSchedule = () => {
             setIsSaved(true);
             setTimeout(() => setIsSaved(false), 3000);
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to save schedule');
+            toast.error(err.response?.data?.message || 'Failed to save schedule');
         }
     };
 

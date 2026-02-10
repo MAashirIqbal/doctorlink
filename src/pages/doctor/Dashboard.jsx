@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Calendar, Clock, User, Bell, Search, ArrowRight, Star,
@@ -71,8 +72,9 @@ const DoctorDashboard = () => {
 
     useEffect(() => { fetchData(); }, []);
 
-    const handleAccept = async (id) => { try { await acceptAppointment(id); fetchData(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
-    const handleReject = async (id) => { try { await rejectAppointment(id); fetchData(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
+    const toast = useToast();
+    const handleAccept = async (id) => { try { await acceptAppointment(id); fetchData(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); } };
+    const handleReject = async (id) => { try { await rejectAppointment(id); fetchData(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); } };
     const handleLogout = () => { localStorage.setItem('lastRole', 'doctor'); logout(); navigate('/'); };
 
     const statusColors = {

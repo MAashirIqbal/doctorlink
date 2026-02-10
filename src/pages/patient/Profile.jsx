@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     User, Mail, Phone, MapPin, Calendar, Camera, Save,
@@ -18,6 +19,7 @@ const sidebarLinks = [
 
 const PatientProfile = () => {
     const { user, logout, updateUser } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('personal');
     const [isSaved, setIsSaved] = useState(false);
@@ -68,7 +70,7 @@ const PatientProfile = () => {
             setIsSaved(true);
             setTimeout(() => setIsSaved(false), 3000);
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to save');
+            toast.error(err.response?.data?.message || 'Failed to save');
         }
     };
 

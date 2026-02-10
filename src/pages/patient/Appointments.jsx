@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Calendar, Clock, MapPin, Star, Search, Filter, User,
@@ -30,6 +31,7 @@ const statusConfig = {
 };
 
 const RatingModal = ({ isOpen, onClose, doctor, appointmentId, doctorId, onSubmit }) => {
+    const toast = useToast();
     const [rating, setRating] = useState(0);
     const [hover, setHover] = useState(0);
     const [review, setReview] = useState('');
@@ -43,7 +45,7 @@ const RatingModal = ({ isOpen, onClose, doctor, appointmentId, doctorId, onSubmi
             onSubmit?.();
             onClose();
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to submit review');
+            toast.error(err.response?.data?.message || 'Failed to submit review');
         }
         setSubmitting(false);
     };
@@ -124,6 +126,7 @@ const RatingModal = ({ isOpen, onClose, doctor, appointmentId, doctorId, onSubmi
 
 const PatientAppointments = () => {
     const { user, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const location = useLocation();
     const [activeTab, setActiveTab] = useState('all');
@@ -179,7 +182,7 @@ const PatientAppointments = () => {
             await cancelAppointment(id, { reason: 'Cancelled by patient' });
             fetchAppointments();
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to cancel');
+            toast.error(err.response?.data?.message || 'Failed to cancel');
         }
     };
 
@@ -192,9 +195,9 @@ const PatientAppointments = () => {
                 window.location.href = data.url;
                 return;
             }
-            alert('Failed to start checkout');
+            toast.error('Failed to start checkout');
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to start checkout');
+            toast.error(err.response?.data?.message || 'Failed to start checkout');
         }
     };
 

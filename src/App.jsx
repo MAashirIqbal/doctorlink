@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/public/Landing';
 import Auth from './pages/public/Auth';
@@ -43,6 +44,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
+        <ToastProvider>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
@@ -89,6 +91,7 @@ function App() {
           <Route path="/admin/contact-messages" element={<ProtectedRoute roles={['admin']}><AdminContactMessages /></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute roles={['admin']}><AdminSettings /></ProtectedRoute>} />
         </Routes>
+        </ToastProvider>
       </AuthProvider>
     </Router>
   );

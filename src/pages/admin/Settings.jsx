@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Activity, Users, Calendar, Settings, LogOut, Shield, Save,
@@ -9,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getSettings, updateSettings } from '../../api/adminAPI';
+import { getSettings, updateSettings, resetAllSettings, changeAdminPassword, clearAllNotifications } from '../../api/adminAPI';
 
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
@@ -36,11 +37,14 @@ const ToggleSwitch = ({ enabled, onToggle }) => (
 
 const AdminSettings = () => {
     const { user, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('general');
     const [showPassword, setShowPassword] = useState(false);
     const [saved, setSaved] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
+    const [pwLoading, setPwLoading] = useState(false);
 
     const [settings, setSettings] = useState({
         siteName: 'DoctorLink',
@@ -82,7 +86,37 @@ const AdminSettings = () => {
             await updateSettings(settings);
             setSaved(true);
             setTimeout(() => setSaved(false), 2000);
-        } catch (e) { alert(e.response?.data?.message || 'Failed to save'); }
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed to save'); }
+    };
+
+    const handleChangePassword = async () => {
+        if (!passwords.current || !passwords.new) return toast.warning('All password fields are required');
+        if (passwords.new.length < 6) return toast.warning('New password must be at least 6 characters');
+        if (passwords.new !== passwords.confirm) return toast.warning('Passwords do not match');
+        setPwLoading(true);
+        try {
+            await changeAdminPassword({ currentPassword: passwords.current, newPassword: passwords.new });
+            setPasswords({ current: '', new: '', confirm: '' });
+            toast.success('Password changed successfully');
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed to change password'); }
+        setPwLoading(false);
+    };
+
+    const handleResetSettings = async () => {
+        if (!window.confirm('Are you sure? This will restore ALL settings to their defaults.')) return;
+        try {
+            const { data } = await resetAllSettings();
+            if (data.settings) setSettings(prev => ({ ...prev, ...data.settings }));
+            toast.success('Settings reset to defaults');
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed to reset settings'); }
+    };
+
+    const handleClearNotifications = async () => {
+        if (!window.confirm('Are you sure? This will permanently delete ALL notifications for all users.')) return;
+        try {
+            const { data } = await clearAllNotifications();
+            toast.success(data.message || 'Notifications cleared');
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed to clear notifications'); }
     };
 
     const handleLogout = () => { logout(); navigate('/admin-portal/login'); };
@@ -380,6 +414,8 @@ const AdminSettings = () => {
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
                                                 placeholder="Enter current password"
+                                                value={passwords.current}
+                                                onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
                                                 className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3.5 px-4 pr-12 text-gray-900 font-bold text-sm focus:outline-none focus:border-primary-200 transition-all"
                                             />
                                             <button onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -392,6 +428,8 @@ const AdminSettings = () => {
                                         <input
                                             type="password"
                                             placeholder="Enter new password"
+                                            value={passwords.new}
+                                            onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
                                             className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3.5 px-4 text-gray-900 font-bold text-sm focus:outline-none focus:border-primary-200 transition-all"
                                         />
                                     </div>
@@ -400,11 +438,17 @@ const AdminSettings = () => {
                                         <input
                                             type="password"
                                             placeholder="Confirm new password"
+                                            value={passwords.confirm}
+                                            onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
                                             className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3.5 px-4 text-gray-900 font-bold text-sm focus:outline-none focus:border-primary-200 transition-all"
                                         />
                                     </div>
-                                    <button className="px-8 py-3.5 bg-primary-700 text-white rounded-2xl font-black text-sm hover:bg-primary-800 transition-all shadow-lg shadow-primary-700/20 active:scale-95 mt-2">
-                                        Update Password
+                                    <button
+                                        onClick={handleChangePassword}
+                                        disabled={pwLoading}
+                                        className="px-8 py-3.5 bg-primary-700 text-white rounded-2xl font-black text-sm hover:bg-primary-800 transition-all shadow-lg shadow-primary-700/20 active:scale-95 mt-2 disabled:opacity-50"
+                                    >
+                                        {pwLoading ? 'Updating...' : 'Update Password'}
                                     </button>
                                 </div>
                             </div>
@@ -441,17 +485,17 @@ const AdminSettings = () => {
                                             <p className="text-sm font-black text-gray-900">Reset All Settings</p>
                                             <p className="text-xs font-bold text-gray-400 mt-0.5">Restore all settings to their default values</p>
                                         </div>
-                                        <button className="px-5 py-2.5 bg-white text-red-600 border border-red-200 rounded-xl text-xs font-black hover:bg-red-50 transition-all active:scale-95">
+                                        <button onClick={handleResetSettings} className="px-5 py-2.5 bg-white text-red-600 border border-red-200 rounded-xl text-xs font-black hover:bg-red-50 transition-all active:scale-95">
                                             Reset Settings
                                         </button>
                                     </div>
                                     <div className="flex items-center justify-between p-5 bg-red-50/50 rounded-2xl border border-red-100">
                                         <div>
-                                            <p className="text-sm font-black text-gray-900">Clear All Logs</p>
-                                            <p className="text-xs font-bold text-gray-400 mt-0.5">Permanently delete all system and activity logs</p>
+                                            <p className="text-sm font-black text-gray-900">Clear All Notifications</p>
+                                            <p className="text-xs font-bold text-gray-400 mt-0.5">Permanently delete all notifications for all users</p>
                                         </div>
-                                        <button className="px-5 py-2.5 bg-white text-red-600 border border-red-200 rounded-xl text-xs font-black hover:bg-red-50 transition-all active:scale-95">
-                                            Clear Logs
+                                        <button onClick={handleClearNotifications} className="px-5 py-2.5 bg-white text-red-600 border border-red-200 rounded-xl text-xs font-black hover:bg-red-50 transition-all active:scale-95">
+                                            Clear All
                                         </button>
                                     </div>
                                 </div>

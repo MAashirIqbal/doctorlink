@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Activity, Calendar, Settings, LogOut, Shield,
@@ -37,6 +38,7 @@ const statusConfig = {
 
 const AdminAppointmentDetail = () => {
     const { user: authUser, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const { id } = useParams();
     const [data, setData] = useState(null);
@@ -59,7 +61,7 @@ const AdminAppointmentDetail = () => {
         try {
             await overrideAppointmentStatus(id, { status: newStatus });
             fetchData();
-        } catch (e) { alert(e.response?.data?.message || 'Failed'); }
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
         setActionLoading(false);
     };
 

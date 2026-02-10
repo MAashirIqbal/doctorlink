@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Calendar, Clock, User, Activity, LogOut, ArrowLeft,
@@ -31,6 +32,7 @@ const statusConfig = {
 
 const DoctorAppointmentDetail = () => {
     const { user, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const { id } = useParams();
     const [appointment, setAppointment] = useState(null);
@@ -63,7 +65,7 @@ const DoctorAppointmentDetail = () => {
         try {
             await acceptAppointment(id);
             await fetchDetail();
-        } catch (err) { alert(err.response?.data?.message || 'Failed'); }
+        } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
         setActionLoading(false);
     };
 
@@ -73,7 +75,7 @@ const DoctorAppointmentDetail = () => {
         try {
             await rejectAppointment(id, { reason: 'Rejected by doctor' });
             await fetchDetail();
-        } catch (err) { alert(err.response?.data?.message || 'Failed'); }
+        } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
         setActionLoading(false);
     };
 
@@ -82,7 +84,7 @@ const DoctorAppointmentDetail = () => {
         try {
             await completeAppointment(id);
             await fetchDetail();
-        } catch (err) { alert(err.response?.data?.message || 'Failed'); }
+        } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
         setActionLoading(false);
     };
 
@@ -92,7 +94,7 @@ const DoctorAppointmentDetail = () => {
         try {
             await markNoShow(id);
             await fetchDetail();
-        } catch (err) { alert(err.response?.data?.message || 'Failed'); }
+        } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
         setActionLoading(false);
     };
 
@@ -101,7 +103,7 @@ const DoctorAppointmentDetail = () => {
         try {
             await acceptReschedule(id);
             await fetchDetail();
-        } catch (err) { alert(err.response?.data?.message || 'Failed'); }
+        } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
         setActionLoading(false);
     };
 
@@ -111,7 +113,7 @@ const DoctorAppointmentDetail = () => {
         try {
             await rejectReschedule(id);
             await fetchDetail();
-        } catch (err) { alert(err.response?.data?.message || 'Failed'); }
+        } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
         setActionLoading(false);
     };
 

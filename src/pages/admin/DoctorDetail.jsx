@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Activity, Users, Calendar, Settings, LogOut, Shield,
@@ -43,6 +44,7 @@ const docStatusConfig = {
 
 const AdminDoctorDetail = () => {
     const { user: authUser, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const { id } = useParams();
     const [data, setData] = useState(null);
@@ -66,14 +68,14 @@ const AdminDoctorDetail = () => {
 
     const handleApprove = async () => {
         setActionLoading(true);
-        try { await approveDoctor(id); fetchData(); } catch (e) { alert(e.response?.data?.message || 'Failed'); }
+        try { await approveDoctor(id); fetchData(); toast.success('Doctor approved'); } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
         setActionLoading(false);
     };
 
     const handleReject = async () => {
         if (!window.confirm('Are you sure you want to reject this doctor?')) return;
         setActionLoading(true);
-        try { await rejectDoctor(id); fetchData(); } catch (e) { alert(e.response?.data?.message || 'Failed'); }
+        try { await rejectDoctor(id); fetchData(); toast.success('Doctor rejected'); } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
         setActionLoading(false);
     };
 
@@ -85,24 +87,24 @@ const AdminDoctorDetail = () => {
         try {
             if (doc.user.isBlocked) { await unblockUser(doc.user._id); } else { await blockUser(doc.user._id); }
             fetchData();
-        } catch (e) { alert(e.response?.data?.message || 'Failed'); }
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
     };
 
     const handleResetPassword = async () => {
-        if (!newPassword || newPassword.length < 6) return alert('Password must be at least 6 characters');
+        if (!newPassword || newPassword.length < 6) return toast.warning('Password must be at least 6 characters');
         const userId = data?.doctor?.user?._id;
         if (!userId) return;
         setPasswordLoading(true);
         try {
             await resetUserPassword(userId, { newPassword });
             setNewPassword('');
-            alert('Password reset successfully');
-        } catch (e) { alert(e.response?.data?.message || 'Failed'); }
+            toast.success('Password reset successfully');
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
         setPasswordLoading(false);
     };
 
     const handleSendAnnouncement = async () => {
-        if (!announcementForm.title || !announcementForm.message) return alert('Title and message are required');
+        if (!announcementForm.title || !announcementForm.message) return toast.warning('Title and message are required');
         const userId = data?.doctor?.user?._id;
         if (!userId) return;
         setAnnouncementLoading(true);
@@ -110,8 +112,8 @@ const AdminDoctorDetail = () => {
             await createAnnouncement({ ...announcementForm, targetUser: userId });
             setAnnouncementForm({ title: '', message: '', type: 'info' });
             fetchData();
-            alert('Announcement sent');
-        } catch (e) { alert(e.response?.data?.message || 'Failed'); }
+            toast.success('Announcement sent');
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
         setAnnouncementLoading(false);
     };
 

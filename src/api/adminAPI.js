@@ -30,6 +30,13 @@ export const getReports = () => API.get('/admin/reports');
 // Settings
 export const getSettings = () => API.get('/admin/settings');
 export const updateSettings = (data) => API.put('/admin/settings', data);
+export const resetAllSettings = () => API.put('/admin/settings/reset');
+
+// Security
+export const changeAdminPassword = (data) => API.put('/admin/change-password', data);
+
+// Notifications (admin)
+export const clearAllNotifications = () => API.delete('/admin/notifications/clear');
 
 // Announcements (admin)
 export const getAnnouncements = () => API.get('/admin/announcements');

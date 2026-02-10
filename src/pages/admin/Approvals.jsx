@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Users, Calendar, Bell, Search, Settings, LogOut, Shield,
@@ -171,12 +172,13 @@ const AdminApprovals = () => {
         (d.specialization || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const toast = useToast();
     const handleApprove = async (id) => {
-        try { await approveDoctor(id); fetchDoctors(); } catch(e) { alert(e.response?.data?.message || 'Failed'); }
+        try { await approveDoctor(id); fetchDoctors(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); }
     };
 
     const handleReject = async (id) => {
-        try { await rejectDoctor(id); fetchDoctors(); } catch(e) { alert(e.response?.data?.message || 'Failed'); }
+        try { await rejectDoctor(id); fetchDoctors(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); }
     };
 
     const handleLogout = () => { logout(); navigate('/admin-portal/login'); };

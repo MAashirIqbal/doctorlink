@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Calendar, Clock, MapPin, Star, User, Activity, LogOut,
@@ -38,6 +39,7 @@ const paymentStatusConfig = {
 const AppointmentDetail = () => {
     const { id } = useParams();
     const { user, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const [appointment, setAppointment] = useState(null);
     const [payment, setPayment] = useState(null);
@@ -88,7 +90,7 @@ const AppointmentDetail = () => {
     };
 
     const handleReschedule = async () => {
-        if (!rescheduleDate || !rescheduleSlot) return alert('Please select a date and time slot');
+        if (!rescheduleDate || !rescheduleSlot) return toast.warning('Please select a date and time slot');
         setRescheduleLoading(true);
         try {
             await rescheduleAppointment(id, { date: rescheduleDate, timeSlot: rescheduleSlot });
@@ -97,7 +99,7 @@ const AppointmentDetail = () => {
             setRescheduleSlot('');
             await fetchDetail();
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to reschedule');
+            toast.error(err.response?.data?.message || 'Failed to reschedule');
         }
         setRescheduleLoading(false);
     };
@@ -110,7 +112,7 @@ const AppointmentDetail = () => {
             setAppointment(data.appointment);
             setPayment(data.payment);
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to cancel');
+            toast.error(err.response?.data?.message || 'Failed to cancel');
         }
     };
 
@@ -121,9 +123,9 @@ const AppointmentDetail = () => {
                 window.location.href = data.url;
                 return;
             }
-            alert('Failed to start checkout');
+            toast.error('Failed to start checkout');
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to start checkout');
+            toast.error(err.response?.data?.message || 'Failed to start checkout');
         }
     };
 

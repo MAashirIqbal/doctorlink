@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Activity, LayoutDashboard, UserCheck, Users, Calendar, CreditCard, BarChart3,
@@ -23,6 +24,7 @@ const sidebarLinks = [
 
 const ContactMessages = () => {
     const { user, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ const ContactMessages = () => {
             await markContactMessageRead(id);
             fetch();
         } catch (e) {
-            alert(e.response?.data?.message || 'Failed');
+            toast.error(e.response?.data?.message || 'Failed');
         }
     };
 

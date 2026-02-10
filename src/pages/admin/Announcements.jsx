@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Activity, Calendar, Settings, LogOut, Shield,
@@ -33,6 +34,7 @@ const typeConfig = {
 
 const AdminAnnouncements = () => {
     const { user: authUser, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const [announcements, setAnnouncements] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -72,7 +74,7 @@ const AdminAnnouncements = () => {
     };
 
     const handleSave = async () => {
-        if (!form.title || !form.message) return alert('Title and message are required');
+        if (!form.title || !form.message) return toast.warning('Title and message are required');
         setSaving(true);
         try {
             const payload = { ...form, expiresAt: form.expiresAt || null };
@@ -83,20 +85,20 @@ const AdminAnnouncements = () => {
             }
             resetForm();
             fetchAnnouncements();
-        } catch (e) { alert(e.response?.data?.message || 'Failed to save'); }
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed to save'); }
         setSaving(false);
     };
 
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this announcement?')) return;
-        try { await deleteAnnouncement(id); fetchAnnouncements(); } catch (e) { alert('Failed to delete'); }
+        try { await deleteAnnouncement(id); fetchAnnouncements(); } catch (e) { toast.error('Failed to delete'); }
     };
 
     const handleToggleActive = async (a) => {
         try {
             await updateAnnouncement(a._id, { isActive: !a.isActive });
             fetchAnnouncements();
-        } catch (e) { alert('Failed to update'); }
+        } catch (e) { toast.error('Failed to update'); }
     };
 
     const handleLogout = () => { logout(); navigate('/admin-portal/login'); };

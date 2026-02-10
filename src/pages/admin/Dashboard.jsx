@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, Users, Calendar, DollarSign, TrendingUp, Bell,
     Search, Settings, LogOut, Shield, ChevronRight, ArrowRight,
     CheckCircle2, XCircle, AlertCircle, Eye, Ban, UserCheck,
     Stethoscope, BarChart3, CreditCard, Clock, Star, MapPin,
-    FileText, LayoutDashboard, UserX, RefreshCw, Mail
+    FileText, LayoutDashboard, UserX, RefreshCw, Mail, Megaphone, Heart
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getAdminDashboard, getPendingDoctors, approveDoctor, rejectDoctor, getAllAppointments, getAllUsers } from '../../api/adminAPI';
+import NotificationDropdown from '../../components/NotificationDropdown';
+import AnnouncementBanner from '../../components/AnnouncementBanner';
 
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard', active: true },
     { icon: UserCheck, label: 'Doctor Approvals', path: '/admin/approvals' },
-    { icon: Users, label: 'Patients', path: '/admin/patients' },
+    { icon: Heart, label: 'Patients', path: '/admin/patients' },
     { icon: Stethoscope, label: 'Doctors', path: '/admin/doctors' },
     { icon: Calendar, label: 'Appointments', path: '/admin/appointments' },
     { icon: CreditCard, label: 'Payments', path: '/admin/payments' },
-    { icon: Bell, label: 'Announcements', path: '/admin/announcements' },
+    { icon: Megaphone, label: 'Announcements', path: '/admin/announcements' },
     { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
     { icon: Mail, label: 'Contact Messages', path: '/admin/contact-messages' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
@@ -63,8 +66,9 @@ const AdminDashboard = () => {
 
     useEffect(() => { fetchData(); }, []);
 
-    const handleApprove = async (id) => { try { await approveDoctor(id); fetchData(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
-    const handleReject = async (id) => { try { await rejectDoctor(id); fetchData(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
+    const toast = useToast();
+    const handleApprove = async (id) => { try { await approveDoctor(id); fetchData(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); } };
+    const handleReject = async (id) => { try { await rejectDoctor(id); fetchData(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); } };
     const handleLogout = () => { logout(); navigate('/admin-portal/login'); };
 
     return (
@@ -136,10 +140,7 @@ const AdminDashboard = () => {
                                     className="pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary-200 w-56 transition-all"
                                 />
                             </div>
-                            <button className="relative p-2.5 bg-gray-50 border border-gray-100 rounded-xl text-gray-500 hover:text-primary-700 hover:bg-primary-50 transition-all">
-                                <Bell size={18} />
-                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[8px] text-white font-black flex items-center justify-center">5</span>
-                            </button>
+                            <NotificationDropdown />
                         </div>
                     </div>
                 </header>

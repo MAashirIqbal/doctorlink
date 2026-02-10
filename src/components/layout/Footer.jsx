@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Activity, Instagram, Twitter, Linkedin, Facebook, MapPin, Phone, Mail, ArrowRight, Heart, ShieldCheck, Lock, CheckCircle } from 'lucide-react';
+import { Activity, MapPin, Phone, Mail, ArrowRight, Heart, ShieldCheck, Lock, CheckCircle } from 'lucide-react';
 
 const Footer = () => {
     return (
@@ -33,20 +33,13 @@ const Footer = () => {
                             </div>
                         </div>
 
-                        <div className="flex gap-3">
-                            {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
-                                <a key={i} href="#" className="w-10 h-10 bg-gray-50 border border-gray-100 text-gray-400 hover:text-primary-700 hover:bg-primary-50 hover:border-primary-100 rounded-xl flex items-center justify-center transition-all">
-                                    <Icon size={18} />
-                                </a>
-                            ))}
-                        </div>
                     </div>
 
                     {/* Quick Links */}
                     <div>
                         <h4 className="text-lg font-black mb-8 font-display text-gray-900 uppercase tracking-widest">Platform</h4>
                         <ul className="space-y-4">
-                            {['Find Specialists', 'AI Symptom Analyzer', 'Specialist Portal', 'Patient Dashboard'].map((item) => (
+                            {['Find Doctors', 'Book Appointment', 'Doctor Portal', 'Patient Dashboard'].map((item) => (
                                 <li key={item}>
                                     <a href="#" className="text-gray-600 font-bold opacity-70 hover:opacity-100 hover:text-primary-700 transition-all flex items-center gap-2">
                                         {item}

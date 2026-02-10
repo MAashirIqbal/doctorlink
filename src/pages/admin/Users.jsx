@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Activity, Users, Calendar, Search, Settings, LogOut, Shield,
@@ -23,6 +24,7 @@ const sidebarLinks = [
 
 const AdminUsers = () => {
     const { user: authUser, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [roleFilter, setRoleFilter] = useState('all');
@@ -51,7 +53,7 @@ const AdminUsers = () => {
         try {
             if (isBlocked) { await unblockUser(id); } else { await blockUser(id); }
             fetchUsers();
-        } catch (e) { alert(e.response?.data?.message || 'Failed'); }
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
     };
 
     const handleLogout = () => { logout(); navigate('/admin-portal/login'); };

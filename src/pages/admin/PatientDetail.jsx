@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Activity, Users, Calendar, Search, Settings, LogOut, Shield,
@@ -36,6 +37,7 @@ const statusConfig = {
 
 const AdminPatientDetail = () => {
     const { user: authUser, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const { id } = useParams();
     const [data, setData] = useState(null);
@@ -63,29 +65,29 @@ const AdminPatientDetail = () => {
         try {
             if (data.user.isBlocked) { await unblockUser(id); } else { await blockUser(id); }
             fetchData();
-        } catch (e) { alert(e.response?.data?.message || 'Failed'); }
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
     };
 
     const handleResetPassword = async () => {
-        if (!newPassword || newPassword.length < 6) return alert('Password must be at least 6 characters');
+        if (!newPassword || newPassword.length < 6) return toast.warning('Password must be at least 6 characters');
         setPasswordLoading(true);
         try {
             await resetUserPassword(id, { newPassword });
             setNewPassword('');
-            alert('Password reset successfully');
-        } catch (e) { alert(e.response?.data?.message || 'Failed'); }
+            toast.success('Password reset successfully');
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
         setPasswordLoading(false);
     };
 
     const handleSendAnnouncement = async () => {
-        if (!announcementForm.title || !announcementForm.message) return alert('Title and message are required');
+        if (!announcementForm.title || !announcementForm.message) return toast.warning('Title and message are required');
         setAnnouncementLoading(true);
         try {
             await createAnnouncement({ ...announcementForm, targetUser: id });
             setAnnouncementForm({ title: '', message: '', type: 'info' });
             fetchData();
-            alert('Announcement sent');
-        } catch (e) { alert(e.response?.data?.message || 'Failed'); }
+            toast.success('Announcement sent');
+        } catch (e) { toast.error(e.response?.data?.message || 'Failed'); }
         setAnnouncementLoading(false);
     };
 

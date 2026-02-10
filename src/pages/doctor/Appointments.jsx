@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
     Calendar, Clock, User, Search, Activity, LogOut,
@@ -30,6 +31,7 @@ const statusConfig = {
 
 const DoctorAppointments = () => {
     const { user, logout } = useAuth();
+    const toast = useToast();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -47,12 +49,12 @@ const DoctorAppointments = () => {
 
     useEffect(() => { fetchAppointments(); }, [activeTab]);
 
-    const handleAccept = async (id) => { try { await acceptAppointment(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
-    const handleReject = async (id) => { try { await rejectAppointment(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
-    const handleComplete = async (id) => { try { await completeAppointment(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
-    const handleNoShow = async (id) => { if (!window.confirm('Mark this appointment as no-show? The patient will be notified.')) return; try { await markNoShow(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
-    const handleAcceptReschedule = async (id) => { try { await acceptReschedule(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
-    const handleRejectReschedule = async (id) => { if (!window.confirm('Reject this reschedule request?')) return; try { await rejectReschedule(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
+    const handleAccept = async (id) => { try { await acceptAppointment(id); fetchAppointments(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); } };
+    const handleReject = async (id) => { try { await rejectAppointment(id); fetchAppointments(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); } };
+    const handleComplete = async (id) => { try { await completeAppointment(id); fetchAppointments(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); } };
+    const handleNoShow = async (id) => { if (!window.confirm('Mark this appointment as no-show? The patient will be notified.')) return; try { await markNoShow(id); fetchAppointments(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); } };
+    const handleAcceptReschedule = async (id) => { try { await acceptReschedule(id); fetchAppointments(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); } };
+    const handleRejectReschedule = async (id) => { if (!window.confirm('Reject this reschedule request?')) return; try { await rejectReschedule(id); fetchAppointments(); } catch(e) { toast.error(e.response?.data?.message || 'Failed'); } };
     const handleLogout = () => { localStorage.setItem('lastRole', 'doctor'); logout(); navigate('/'); };
 
     const tabs = [
