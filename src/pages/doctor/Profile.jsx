@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getMyDoctorProfile, updateMyDoctorProfile, updateMySchedule } from '../../api/doctorAPI';
+import { getMyDoctorProfile, updateMyDoctorProfile } from '../../api/doctorAPI';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard' },
@@ -34,16 +34,7 @@ const DoctorProfile = () => {
         experience: 0, fee: 0, location: '', about: '', languages: [], pmcNumber: '',
     });
 
-    const defaultAvail = {
-        Monday: { enabled: false, start: '09:00', end: '17:00' },
-        Tuesday: { enabled: false, start: '09:00', end: '17:00' },
-        Wednesday: { enabled: false, start: '09:00', end: '17:00' },
-        Thursday: { enabled: false, start: '09:00', end: '17:00' },
-        Friday: { enabled: false, start: '09:00', end: '14:00' },
-        Saturday: { enabled: false, start: '10:00', end: '14:00' },
-        Sunday: { enabled: false, start: '', end: '' },
-    };
-    const [availability, setAvailability] = useState(defaultAvail);
+    const [scheduleData, setScheduleData] = useState([]);
 
     useEffect(() => {
         const fetch = async () => {
@@ -65,11 +56,7 @@ const DoctorProfile = () => {
                 });
                 setAvatarData(d.avatar || d.user?.avatar || '');
                 if (d.schedule?.length) {
-                    const mapped = { ...defaultAvail };
-                    d.schedule.forEach(s => {
-                        if (mapped[s.day]) mapped[s.day] = { enabled: s.isActive !== false, start: s.startTime || '09:00', end: s.endTime || '17:00' };
-                    });
-                    setAvailability(mapped);
+                    setScheduleData(d.schedule);
                 }
             } catch (err) { console.error(err); }
             setLoading(false);
@@ -111,15 +98,6 @@ const DoctorProfile = () => {
                 languages: profile.languages,
                 avatar: avatarData,
             });
-
-            // Also save availability/schedule
-            const schedulePayload = Object.entries(availability).map(([day, val]) => ({
-                day,
-                isActive: val.enabled,
-                startTime: val.start,
-                endTime: val.end,
-            }));
-            await updateMySchedule({ schedule: schedulePayload });
 
             updateUser({
                 ...(user || {}),
@@ -371,61 +349,43 @@ const DoctorProfile = () => {
                             animate={{ opacity: 1, y: 0 }}
                             className="bg-white rounded-3xl border border-gray-100 p-8"
                         >
-                            <h3 className="text-lg font-black text-gray-900 mb-2 font-display">Weekly Availability</h3>
-                            <p className="text-sm font-bold text-gray-400 mb-8">Set your available days and working hours</p>
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 className="text-lg font-black text-gray-900 font-display">Weekly Availability</h3>
+                                    <p className="text-sm font-bold text-gray-400 mt-1">Your current schedule as seen by patients</p>
+                                </div>
+                                <Link to="/doctor/schedule" className="flex items-center gap-2 bg-primary-700 hover:bg-primary-800 text-white px-5 py-2.5 rounded-xl font-black text-sm transition-all">
+                                    <ClipboardList size={14} />
+                                    Manage Schedule
+                                </Link>
+                            </div>
 
-                            <div className="space-y-4">
-                                {daysOfWeek.map((day) => (
-                                    <div key={day} className={`flex items-center gap-6 p-5 rounded-2xl border transition-all ${availability[day].enabled
-                                        ? 'bg-white border-primary-100'
-                                        : 'bg-gray-50/50 border-gray-100'
+                            <div className="space-y-3">
+                                {daysOfWeek.map((day) => {
+                                    const sched = scheduleData.find(s => s.day === day);
+                                    const isActive = sched?.isActive !== false && sched?.slots?.length > 0;
+                                    return (
+                                        <div key={day} className={`p-4 rounded-2xl border transition-all ${
+                                            isActive ? 'bg-white border-primary-100' : 'bg-gray-50/50 border-gray-100'
                                         }`}>
-                                        {/* Toggle */}
-                                        <button
-                                            onClick={() => setAvailability({
-                                                ...availability,
-                                                [day]: { ...availability[day], enabled: !availability[day].enabled }
-                                            })}
-                                            className={`w-12 h-7 rounded-full transition-all relative flex-shrink-0 ${availability[day].enabled ? 'bg-primary-700' : 'bg-gray-200'
-                                                }`}
-                                        >
-                                            <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-sm transition-all ${availability[day].enabled ? 'left-6' : 'left-1'
-                                                }`} />
-                                        </button>
-
-                                        {/* Day Name */}
-                                        <span className={`w-28 text-sm font-black ${availability[day].enabled ? 'text-gray-900' : 'text-gray-400'}`}>
-                                            {day}
-                                        </span>
-
-                                        {/* Time Inputs */}
-                                        {availability[day].enabled ? (
-                                            <div className="flex items-center gap-3 flex-1">
-                                                <input
-                                                    type="time"
-                                                    value={availability[day].start}
-                                                    onChange={(e) => setAvailability({
-                                                        ...availability,
-                                                        [day]: { ...availability[day], start: e.target.value }
-                                                    })}
-                                                    className="bg-gray-50 border border-gray-100 rounded-xl py-2.5 px-4 text-sm font-bold text-gray-900 focus:outline-none focus:border-primary-200 transition-all"
-                                                />
-                                                <span className="text-gray-400 font-bold text-sm">to</span>
-                                                <input
-                                                    type="time"
-                                                    value={availability[day].end}
-                                                    onChange={(e) => setAvailability({
-                                                        ...availability,
-                                                        [day]: { ...availability[day], end: e.target.value }
-                                                    })}
-                                                    className="bg-gray-50 border border-gray-100 rounded-xl py-2.5 px-4 text-sm font-bold text-gray-900 focus:outline-none focus:border-primary-200 transition-all"
-                                                />
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-3 h-3 rounded-full flex-shrink-0 ${isActive ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                                                <span className={`w-28 text-sm font-black ${isActive ? 'text-gray-900' : 'text-gray-400'}`}>{day}</span>
+                                                {isActive ? (
+                                                    <div className="flex flex-wrap gap-1.5 flex-1">
+                                                        {sched.slots.map((slot, j) => (
+                                                            <span key={j} className="px-2.5 py-1 bg-primary-50 text-primary-700 rounded-lg text-[11px] font-black border border-primary-100">
+                                                                {slot}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-sm font-bold text-gray-400 italic">Unavailable</span>
+                                                )}
                                             </div>
-                                        ) : (
-                                            <span className="text-sm font-bold text-gray-400 italic">Unavailable</span>
-                                        )}
-                                    </div>
-                                ))}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </motion.div>
                     )}

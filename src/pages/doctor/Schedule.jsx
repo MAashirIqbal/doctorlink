@@ -22,6 +22,13 @@ const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Sat
 
 const defaultSlots = ['09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM', '05:00 PM'];
 
+// Normalize '9:00 AM' → '09:00 AM' for consistent comparison
+const normalizeSlot = (slot) => {
+    const match = slot.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (!match) return slot;
+    return `${match[1].padStart(2, '0')}:${match[2]} ${match[3].toUpperCase()}`;
+};
+
 const DoctorSchedule = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -49,7 +56,7 @@ const DoctorSchedule = () => {
                 const mapped = { ...emptySchedule };
                 backendSchedule.forEach(s => {
                     if (mapped[s.day] !== undefined) {
-                        mapped[s.day] = { enabled: s.isActive !== false, slots: s.slots || [] };
+                        mapped[s.day] = { enabled: s.isActive !== false, slots: (s.slots || []).map(normalizeSlot) };
                     }
                 });
                 setSchedule(mapped);

@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getDoctorDashboard, getMyEarnings } from '../../api/doctorAPI';
+import { getDoctorDashboard, getMyEarnings, getDoctorReviews } from '../../api/doctorAPI';
 import { getDoctorAppointments, acceptAppointment, rejectAppointment } from '../../api/appointmentAPI';
 import NotificationDropdown from '../../components/NotificationDropdown';
 
@@ -34,6 +34,7 @@ const DoctorDashboard = () => {
     const [stats, setStats] = useState({ todayAppointments: 0, totalPatients: 0, monthEarnings: 0, rating: 0, totalReviews: 0 });
     const [todayAppointments, setTodayAppointments] = useState([]);
     const [recentEarnings, setRecentEarnings] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
@@ -53,6 +54,14 @@ const DoctorDashboard = () => {
 
             setTodayAppointments(dashRes.data.todaySchedule || []);
             setRecentEarnings(earnRes.data.recentPayments || []);
+
+            // Fetch reviews if we have doctorId
+            if (dashRes.data.doctorId) {
+                try {
+                    const revRes = await getDoctorReviews(dashRes.data.doctorId);
+                    setReviews(revRes.data.reviews || []);
+                } catch (e) { /* reviews are optional */ }
+            }
         } catch (err) {
             console.error('Doctor dashboard error:', err);
         }
@@ -186,7 +195,8 @@ const DoctorDashboard = () => {
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: 0.15 + i * 0.07 }}
-                                            className="p-5 hover:bg-primary-50/30 transition-colors"
+                                            className="p-5 hover:bg-primary-50/30 transition-colors cursor-pointer"
+                                            onClick={() => navigate(`/doctor/appointments/${apt._id}`)}
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="text-center w-16 flex-shrink-0">
@@ -207,7 +217,7 @@ const DoctorDashboard = () => {
                                                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${statusColors[apt.status] || statusColors.pending}`}>
                                                     {apt.status}
                                                 </span>
-                                                <div className="flex gap-2">
+                                                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                                                     {apt.status === 'pending' && (
                                                         <>
                                                             <button onClick={() => handleAccept(apt._id)} className="p-2 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 hover:bg-emerald-100 transition-all" title="Accept">
@@ -288,11 +298,42 @@ const DoctorDashboard = () => {
                                 </div>
                             </motion.div>
 
+                            {/* Recent Reviews */}
+                            {reviews.length > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.4 }}
+                                    className="bg-white rounded-3xl border border-gray-200/60 shadow-sm shadow-gray-200/50 overflow-hidden"
+                                >
+                                    <div className="p-5 border-b border-gray-50">
+                                        <h3 className="text-lg font-black text-gray-900 font-display">Patient Reviews</h3>
+                                        <p className="text-xs font-bold text-gray-400 mt-0.5">{stats.rating?.toFixed(1)} avg from {stats.totalReviews} review{stats.totalReviews !== 1 ? 's' : ''}</p>
+                                    </div>
+                                    <div className="divide-y divide-gray-50">
+                                        {reviews.slice(0, 3).map((rev, i) => (
+                                            <div key={rev._id || i} className="p-4">
+                                                <div className="flex items-center justify-between mb-1.5">
+                                                    <p className="text-sm font-black text-gray-900">{rev.patient?.name || 'Patient'}</p>
+                                                    <div className="flex items-center gap-0.5">
+                                                        {[...Array(5)].map((_, j) => (
+                                                            <Star key={j} size={12} className={j < rev.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200'} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                {rev.comment && <p className="text-xs font-bold text-gray-500 line-clamp-2">{rev.comment}</p>}
+                                                <p className="text-[10px] font-bold text-gray-400 mt-1">{new Date(rev.createdAt).toLocaleDateString()}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+
                             {/* Quick Actions */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4 }}
+                                transition={{ delay: 0.45 }}
                                 className="bg-white rounded-3xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-6"
                             >
                                 <h3 className="text-lg font-black text-gray-900 font-display mb-4">Quick Actions</h3>

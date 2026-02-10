@@ -242,6 +242,10 @@ const DoctorAppointments = () => {
                                                             Complete
                                                         </button>
                                                     )}
+                                                    <Link to={`/doctor/appointments/${apt._id}`} className="flex items-center gap-1.5 px-4 py-2.5 bg-gray-50 text-gray-600 border border-gray-100 rounded-xl text-xs font-black hover:bg-gray-100 transition-all active:scale-95">
+                                                        <Eye size={14} />
+                                                        Details
+                                                    </Link>
                                                 </div>
                                             </div>
                                         </div>

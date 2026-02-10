@@ -21,6 +21,7 @@ import DoctorAppointments from './pages/doctor/Appointments';
 import DoctorPatients from './pages/doctor/Patients';
 import DoctorEarnings from './pages/doctor/Earnings';
 import DoctorSchedule from './pages/doctor/Schedule';
+import DoctorAppointmentDetail from './pages/doctor/AppointmentDetail';
 import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminApprovals from './pages/admin/Approvals';
@@ -63,6 +64,7 @@ function App() {
           <Route path="/doctor/patients" element={<ProtectedRoute roles={['doctor']}><DoctorPatients /></ProtectedRoute>} />
           <Route path="/doctor/earnings" element={<ProtectedRoute roles={['doctor']}><DoctorEarnings /></ProtectedRoute>} />
           <Route path="/doctor/schedule" element={<ProtectedRoute roles={['doctor']}><DoctorSchedule /></ProtectedRoute>} />
+          <Route path="/doctor/appointments/:id" element={<ProtectedRoute roles={['doctor']}><DoctorAppointmentDetail /></ProtectedRoute>} />
 
           {/* Admin Routes */}
           <Route path="/admin-portal/login" element={<AdminLogin />} />
