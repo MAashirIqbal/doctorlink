@@ -6,7 +6,9 @@ import {
     ShieldCheck, ChevronDown, CheckCircle2,
     FileText, Fingerprint, MapPin, Search
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { applyDoctor, doctorLogin } from '../../api/doctorAPI';
+import { useAuth } from '../../context/AuthContext';
 
 const CustomDropdown = ({ options, selected, onSelect, placeholder }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -112,13 +114,61 @@ const DocumentUpload = ({ label, description }) => {
 };
 
 const DoctorApply = () => {
+    const { login: authLogin } = useAuth();
+    const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(false);
     const [step, setStep] = useState(1);
     const [specialization, setSpecialization] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    // Login form state
+    const [loginEmail, setLoginEmail] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
+
+    // Apply form state
+    const [applyData, setApplyData] = useState({
+        fullName: '', cnic: '', pmcNumber: '', email: '', password: '',
+        experience: '', fee: '', location: '', degree: '',
+    });
+
+    const handleApplyChange = (field, value) => setApplyData(prev => ({ ...prev, [field]: value }));
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setLoading(true); setError('');
+        try {
+            const { data } = await doctorLogin({ email: loginEmail, password: loginPassword });
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('lastRole', 'doctor');
+            authLogin(data.token, data.user);
+            navigate('/doctor/dashboard');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Login failed');
+        }
+        setLoading(false);
+    };
+
+    const handleSubmitApplication = async () => {
+        setLoading(true); setError('');
+        try {
+            await applyDoctor({
+                ...applyData,
+                specialization,
+                experience: Number(applyData.experience),
+                fee: Number(applyData.fee),
+            });
+            setStep(4); // success state
+        } catch (err) {
+            setError(err.response?.data?.message || 'Application failed');
+        }
+        setLoading(false);
+    };
 
     const toggleMode = () => {
         setIsLogin(!isLogin);
         setStep(1);
+        setError('');
     };
 
     const specializations = [
@@ -169,13 +219,14 @@ const DoctorApply = () => {
                             <h2 className="text-4xl font-black text-white mb-2 tracking-tighter uppercase italic underline decoration-emerald-500/50 underline-offset-8">Sign In</h2>
                             <p className="text-emerald-500 font-black mb-12 italic uppercase tracking-[0.2em] text-[10px]">Portal Access for PMC Members</p>
 
-                            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                            <form className="space-y-6" onSubmit={handleLogin}>
+                                {error && isLogin && <p className="text-red-400 text-xs font-bold bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">{error}</p>}
                                 <div className="space-y-4">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-1">Verified Email</label>
                                         <div className="relative group">
                                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40 group-focus-within:text-emerald-400 transition-colors" size={20} />
-                                            <input type="email" placeholder="dr.ali@health.gov.pk"
+                                            <input type="email" placeholder="dr.ali@health.gov.pk" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} required
                                                 className="w-full bg-white/5 border border-white/5 rounded-2xl py-5 pl-12 pr-4 text-white font-bold focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all shadow-inner" />
                                         </div>
                                     </div>
@@ -183,14 +234,13 @@ const DoctorApply = () => {
                                         <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-1">PMC Security Pin</label>
                                         <div className="relative group">
                                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40 group-focus-within:text-emerald-400 transition-colors" size={20} />
-                                            <input type="password" placeholder="••••••••"
+                                            <input type="password" placeholder="••••••••" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required
                                                 className="w-full bg-white/5 border border-white/5 rounded-2xl py-5 pl-12 pr-4 text-white font-bold focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all shadow-inner" />
                                         </div>
                                     </div>
                                 </div>
-                                <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-5 rounded-2xl font-black text-lg transition-all shadow-2xl shadow-emerald-900/40 flex items-center justify-center gap-3 active:scale-[0.98]">
-                                    Verify & Enter
-                                    <ShieldCheck size={20} />
+                                <button type="submit" disabled={loading} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-5 rounded-2xl font-black text-lg transition-all shadow-2xl shadow-emerald-900/40 flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50">
+                                    {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><span>Verify & Enter</span><ShieldCheck size={20} /></>}
                                 </button>
                             </form>
                         </motion.div>
@@ -216,22 +266,28 @@ const DoctorApply = () => {
                                             <p className="text-emerald-500 font-black italic uppercase tracking-[0.2em] text-[10px]">Medical Professional Credentialing</p>
                                         </div>
 
+                                        {error && !isLogin && <p className="text-red-400 text-xs font-bold bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">{error}</p>}
+
                                         <div className="space-y-4">
                                             <div className="relative">
                                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40" size={18} />
-                                                <input type="text" placeholder="Full Name (As per NIC)" className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-black text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner uppercase tracking-wider" />
+                                                <input type="text" placeholder="Full Name (As per NIC)" value={applyData.fullName} onChange={e => handleApplyChange('fullName', e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-black text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner uppercase tracking-wider" />
                                             </div>
                                             <div className="relative">
                                                 <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40" size={18} />
-                                                <input type="text" placeholder="CNIC Number (13 Digits)" className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-black text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner" />
+                                                <input type="text" placeholder="CNIC Number (13 Digits)" value={applyData.cnic} onChange={e => handleApplyChange('cnic', e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-black text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner" />
                                             </div>
                                             <div className="relative">
                                                 <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40" size={18} />
-                                                <input type="text" placeholder="PMC/PMDC Registration #" className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-black text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner" />
+                                                <input type="text" placeholder="PMC/PMDC Registration #" value={applyData.pmcNumber} onChange={e => handleApplyChange('pmcNumber', e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-black text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner" />
                                             </div>
                                             <div className="relative">
                                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40" size={18} />
-                                                <input type="email" placeholder="Official Work Email" className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-black text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner" />
+                                                <input type="email" placeholder="Official Work Email" value={applyData.email} onChange={e => handleApplyChange('email', e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-black text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner" />
+                                            </div>
+                                            <div className="relative">
+                                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40" size={18} />
+                                                <input type="password" placeholder="Create Password" value={applyData.password} onChange={e => handleApplyChange('password', e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-black text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner" />
                                             </div>
                                         </div>
                                         <button onClick={() => setStep(2)} className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black flex items-center justify-center gap-2 group active:scale-[0.98] shadow-xl shadow-emerald-950/40 text-lg">
@@ -256,16 +312,16 @@ const DoctorApply = () => {
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="relative">
                                                     <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40" size={16} />
-                                                    <input type="number" placeholder="Experience" className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-10 pr-4 text-white font-bold text-sm shadow-inner" />
+                                                    <input type="number" placeholder="Experience" value={applyData.experience} onChange={e => handleApplyChange('experience', e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-10 pr-4 text-white font-bold text-sm shadow-inner" />
                                                 </div>
                                                 <div className="relative">
                                                     <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40" size={16} />
-                                                    <input type="number" placeholder="Fee (PKR)" className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-10 pr-4 text-white font-bold text-sm shadow-inner" />
+                                                    <input type="number" placeholder="Fee (PKR)" value={applyData.fee} onChange={e => handleApplyChange('fee', e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-10 pr-4 text-white font-bold text-sm shadow-inner" />
                                                 </div>
                                             </div>
                                             <div className="relative">
                                                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40" size={16} />
-                                                <input type="text" placeholder="Clinic/Hospital Location" className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-10 pr-4 text-white font-bold text-sm shadow-inner" />
+                                                <input type="text" placeholder="Clinic/Hospital Location" value={applyData.location} onChange={e => handleApplyChange('location', e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-10 pr-4 text-white font-bold text-sm shadow-inner" />
                                             </div>
                                         </div>
                                         <div className="flex gap-4">
@@ -276,7 +332,7 @@ const DoctorApply = () => {
                                             </button>
                                         </div>
                                     </motion.div>
-                                ) : (
+                                ) : step === 3 ? (
                                     <motion.div key="s3" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} className="space-y-6">
                                         <div>
                                             <h2 className="text-4xl font-black text-white mb-2 tracking-tighter uppercase italic underline decoration-emerald-500/50 underline-offset-8">Final Proofs</h2>
@@ -291,12 +347,24 @@ const DoctorApply = () => {
 
                                         <div className="flex gap-4">
                                             <button onClick={() => setStep(2)} className="flex-1 bg-white/5 py-4 rounded-2xl text-white/50 font-black hover:bg-white/10 transition-all italic tracking-[0.2em] uppercase text-xs">Back</button>
-                                            <button className="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-emerald-500 transition-all active:scale-[0.98] shadow-xl shadow-emerald-950/40 text-lg">
-                                                Submit Profile
+                                            <button onClick={handleSubmitApplication} disabled={loading} className="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-emerald-500 transition-all active:scale-[0.98] shadow-xl shadow-emerald-950/40 text-lg disabled:opacity-50">
+                                                {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Submit Profile'}
                                             </button>
                                         </div>
                                     </motion.div>
-                                )}
+                                ) : step === 4 ? (
+                                    <motion.div key="s4" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-6 text-center">
+                                        <div className="w-20 h-20 bg-emerald-500/20 rounded-3xl flex items-center justify-center mx-auto">
+                                            <CheckCircle2 size={40} className="text-emerald-400" />
+                                        </div>
+                                        <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic">Application Submitted!</h2>
+                                        <p className="text-emerald-200/60 font-bold text-sm">Your application is under review. You'll receive an email once approved. You can then login to your doctor portal.</p>
+                                        <button onClick={() => { setIsLogin(true); setStep(1); }} className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-emerald-950/40">
+                                            Go to Login
+                                        </button>
+                                    </motion.div>
+                                ) : null
+                                }
                             </AnimatePresence>
                         </motion.div>
                     </div>

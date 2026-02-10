@@ -1,25 +1,86 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, User, ArrowRight, Activity } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Activity, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { loginUser, registerUser } from '../../api/authAPI';
+import { useAuth } from '../../context/AuthContext';
 
 const Auth = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { user, login } = useAuth();
 
-    // Initialize state based on the actual URL to prevent flickering on load
     const [isLogin, setIsLogin] = useState(location.pathname !== '/register');
+    const [loginEmail, setLoginEmail] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
+    const [regName, setRegName] = useState('');
+    const [regEmail, setRegEmail] = useState('');
+    const [regPassword, setRegPassword] = useState('');
+    const [agreed, setAgreed] = useState(false);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [showLoginPass, setShowLoginPass] = useState(false);
+    const [showRegPass, setShowRegPass] = useState(false);
+
+    // Password strength calculator
+    const getPasswordStrength = (password) => {
+        if (!password) return { level: 0, label: '', color: '' };
+        let score = 0;
+        if (password.length >= 6) score++;
+        if (password.length >= 8) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        if (score <= 2) return { level: 1, label: 'Weak', color: 'bg-red-500' };
+        if (score <= 3) return { level: 2, label: 'Normal', color: 'bg-amber-500' };
+        return { level: 3, label: 'Strong', color: 'bg-emerald-500' };
+    };
+    const passwordStrength = getPasswordStrength(regPassword);
 
     useEffect(() => {
         setIsLogin(location.pathname !== '/register');
+        setError('');
     }, [location.pathname]);
 
-    const toggleAuth = () => {
-        if (isLogin) {
-            navigate('/register');
-        } else {
-            navigate('/login');
+    useEffect(() => {
+        if (user) {
+            if (user.role === 'doctor') navigate('/doctor/dashboard');
+            else if (user.role === 'admin') navigate('/admin/dashboard');
+            else navigate('/patient/dashboard');
         }
+    }, [user, navigate]);
+
+    const toggleAuth = () => {
+        setError('');
+        if (isLogin) navigate('/register');
+        else navigate('/login');
+    };
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            const { data } = await loginUser({ email: loginEmail, password: loginPassword });
+            login(data.token, data.user);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Invalid credentials');
+        }
+        setLoading(false);
+    };
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        if (!agreed) { setError('Please agree to the Terms of Service'); return; }
+        setError('');
+        setLoading(true);
+        try {
+            const { data } = await registerUser({ name: regName, email: regEmail, password: regPassword });
+            login(data.token, data.user);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Registration failed');
+        }
+        setLoading(false);
     };
 
     return (
@@ -68,14 +129,24 @@ const Auth = () => {
                         <h2 className="text-4xl font-black text-white mb-2 tracking-tight">Welcome Back</h2>
                         <p className="text-emerald-400 font-bold mb-8 italic">Ready to continue your health journey?</p>
 
-                        <form className="space-y-5">
+                        {error && isLogin && (
+                            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-2xl px-4 py-3 mb-4">
+                                <AlertCircle size={16} className="text-red-400 flex-shrink-0" />
+                                <p className="text-red-300 text-sm font-bold">{error}</p>
+                            </motion.div>
+                        )}
+
+                        <form onSubmit={handleLogin} className="space-y-5">
                             <div className="space-y-2">
                                 <label className="text-xs font-black text-white/50 uppercase tracking-widest ml-1">Email Address</label>
                                 <div className="relative group">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/50 group-focus-within:text-emerald-400 transition-colors" size={20} />
                                     <input
                                         type="email"
+                                        value={loginEmail}
+                                        onChange={(e) => setLoginEmail(e.target.value)}
                                         placeholder="name@example.com"
+                                        required
                                         className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all shadow-inner"
                                     />
                                 </div>
@@ -86,19 +157,24 @@ const Auth = () => {
                                 <div className="relative group">
                                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/50 group-focus-within:text-emerald-400 transition-colors" size={20} />
                                     <input
-                                        type="password"
+                                        type={showLoginPass ? 'text' : 'password'}
+                                        value={loginPassword}
+                                        onChange={(e) => setLoginPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all shadow-inner"
+                                        required
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all shadow-inner"
                                     />
+                                    <button type="button" onClick={() => setShowLoginPass(!showLoginPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-emerald-400 transition-colors">
+                                        {showLoginPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
                                 </div>
                                 <div className="text-right">
                                     <Link to="/forgot-password" size={20} className="text-xs font-black text-emerald-500/70 hover:text-emerald-400 uppercase tracking-tighter">Forgot Password?</Link>
                                 </div>
                             </div>
 
-                            <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-emerald-900/40 active:scale-95 flex items-center justify-center gap-2 group">
-                                Sign In
-                                <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+                            <button type="submit" disabled={loading} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-emerald-900/40 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50">
+                                {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><span>Sign In</span><ArrowRight className="group-hover:translate-x-1 transition-transform" /></>}
                             </button>
                         </form>
 
@@ -134,7 +210,14 @@ const Auth = () => {
                         <h2 className="text-4xl font-black text-white mb-2 tracking-tight">Create Account</h2>
                         <p className="text-emerald-400 font-bold mb-8 italic">Join the future of personalized care.</p>
 
-                        <form className="space-y-4">
+                        {error && !isLogin && (
+                            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-2xl px-4 py-3 mb-4">
+                                <AlertCircle size={16} className="text-red-400 flex-shrink-0" />
+                                <p className="text-red-300 text-sm font-bold">{error}</p>
+                            </motion.div>
+                        )}
+
+                        <form onSubmit={handleRegister} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-white/50 uppercase tracking-widest ml-1">Full Name</label>
@@ -142,7 +225,10 @@ const Auth = () => {
                                         <User className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/50" size={18} />
                                         <input
                                             type="text"
+                                            value={regName}
+                                            onChange={(e) => setRegName(e.target.value)}
                                             placeholder="John Doe"
+                                            required
                                             className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-11 pr-4 text-white font-bold text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner"
                                         />
                                     </div>
@@ -153,7 +239,10 @@ const Auth = () => {
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/50" size={18} />
                                         <input
                                             type="email"
+                                            value={regEmail}
+                                            onChange={(e) => setRegEmail(e.target.value)}
                                             placeholder="j@example.com"
+                                            required
                                             className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-11 pr-4 text-white font-bold text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner"
                                         />
                                     </div>
@@ -165,21 +254,39 @@ const Auth = () => {
                                 <div className="relative group">
                                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/50" size={18} />
                                     <input
-                                        type="password"
+                                        type={showRegPass ? 'text' : 'password'}
+                                        value={regPassword}
+                                        onChange={(e) => setRegPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-11 pr-4 text-white font-bold text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner"
+                                        required
+                                        minLength={6}
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-11 pr-11 text-white font-bold text-sm focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner"
                                     />
+                                    <button type="button" onClick={() => setShowRegPass(!showRegPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-emerald-400 transition-colors">
+                                        {showRegPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
                                 </div>
+                                {regPassword && (
+                                    <div className="flex items-center gap-2 mt-2 px-1">
+                                        <div className="flex gap-1.5 flex-1">
+                                            {[1, 2, 3].map(i => (
+                                                <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${i <= passwordStrength.level ? passwordStrength.color : 'bg-white/10'}`} />
+                                            ))}
+                                        </div>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest ${passwordStrength.level === 1 ? 'text-red-400' : passwordStrength.level === 2 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                                            {passwordStrength.label}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex items-center gap-3 p-1">
-                                <input type="checkbox" className="w-5 h-5 rounded border-white/10 bg-white/5 accent-emerald-500" />
+                                <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="w-5 h-5 rounded border-white/10 bg-white/5 accent-emerald-500" />
                                 <span className="text-xs font-bold text-white/40">I agree to the <Link to="/legal" className="text-emerald-500 underline">Terms of Service</Link></span>
                             </div>
 
-                            <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-emerald-900/40 active:scale-95 flex items-center justify-center gap-2 group mt-2">
-                                Start Your Journey
-                                <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+                            <button type="submit" disabled={loading} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-emerald-900/40 active:scale-95 flex items-center justify-center gap-2 group mt-2 disabled:opacity-50">
+                                {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><span>Start Your Journey</span><ArrowRight className="group-hover:translate-x-1 transition-transform" /></>}
                             </button>
                         </form>
 
