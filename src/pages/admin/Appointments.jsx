@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import {
     Activity, Users, Calendar, Search, Settings, LogOut, Shield,
     CheckCircle2, XCircle, AlertCircle, Eye, UserCheck, Stethoscope,
-    BarChart3, CreditCard, LayoutDashboard, Clock, MapPin, ChevronDown, Mail
+    BarChart3, CreditCard, LayoutDashboard, Clock, MapPin, ChevronDown, Mail,
+    Bell, Heart, Megaphone
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -12,9 +13,11 @@ import { getAllAppointments, overrideAppointmentStatus } from '../../api/adminAP
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
     { icon: UserCheck, label: 'Doctor Approvals', path: '/admin/approvals' },
-    { icon: Users, label: 'User Management', path: '/admin/users' },
+    { icon: Heart, label: 'Patients', path: '/admin/patients' },
+    { icon: Stethoscope, label: 'Doctors', path: '/admin/doctors' },
     { icon: Calendar, label: 'Appointments', path: '/admin/appointments', active: true },
     { icon: CreditCard, label: 'Payments', path: '/admin/payments' },
+    { icon: Megaphone, label: 'Announcements', path: '/admin/announcements' },
     { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
     { icon: Mail, label: 'Contact Messages', path: '/admin/contact-messages' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
@@ -25,6 +28,9 @@ const statusConfig = {
     pending: { color: 'bg-amber-50 text-amber-700 border-amber-100', label: 'Pending' },
     completed: { color: 'bg-primary-50 text-primary-700 border-primary-100', label: 'Completed' },
     cancelled: { color: 'bg-red-50 text-red-600 border-red-100', label: 'Cancelled' },
+    'no-show': { color: 'bg-orange-50 text-orange-700 border-orange-100', label: 'No-Show' },
+    rescheduling: { color: 'bg-blue-50 text-blue-700 border-blue-100', label: 'Rescheduling' },
+    expired: { color: 'bg-gray-100 text-gray-500 border-gray-200', label: 'Expired' },
 };
 
 const AdminAppointments = () => {
@@ -52,6 +58,8 @@ const AdminAppointments = () => {
         { key: 'pending', label: 'Pending' },
         { key: 'confirmed', label: 'Confirmed' },
         { key: 'completed', label: 'Completed' },
+        { key: 'no-show', label: 'No-Show' },
+        { key: 'rescheduling', label: 'Rescheduling' },
         { key: 'cancelled', label: 'Cancelled' },
     ];
 
@@ -218,6 +226,11 @@ const AdminAppointments = () => {
                                             {config.label}
                                         </span>
                                         <div className="flex items-center gap-1.5">
+                                            <Link to={`/admin/appointments/${apt._id}`}
+                                                className="p-2 bg-primary-50 text-primary-700 border border-primary-100 rounded-xl hover:bg-primary-100 transition-all active:scale-95"
+                                                title="View Details">
+                                                <Eye size={13} />
+                                            </Link>
                                             {(apt.status === 'pending' || apt.status === 'confirmed') && (
                                                 <button
                                                     onClick={() => handleOverrideStatus(apt._id, 'cancelled')}

@@ -5,7 +5,7 @@ import {
     ChevronRight, ArrowRight, CheckCircle2, XCircle, AlertCircle, Eye,
     UserCheck, Stethoscope, BarChart3, CreditCard, LayoutDashboard,
     X, MapPin, Briefcase, Mail, Phone, FileText, ShieldCheck,
-    GraduationCap, Clock, Download
+    GraduationCap, Clock, Download, Megaphone
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -13,10 +13,12 @@ import { getPendingDoctors, approveDoctor, rejectDoctor } from '../../api/adminA
 
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
-    { icon: UserCheck, label: 'Doctor Approvals', path: '/admin/approvals', active: true, badge: 4 },
-    { icon: Users, label: 'User Management', path: '/admin/users' },
+    { icon: UserCheck, label: 'Doctor Approvals', path: '/admin/approvals', active: true },
+    { icon: Users, label: 'Patients', path: '/admin/patients' },
+    { icon: Stethoscope, label: 'Doctors', path: '/admin/doctors' },
     { icon: Calendar, label: 'Appointments', path: '/admin/appointments' },
     { icon: CreditCard, label: 'Payments', path: '/admin/payments' },
+    { icon: Bell, label: 'Announcements', path: '/admin/announcements' },
     { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
     { icon: Mail, label: 'Contact Messages', path: '/admin/contact-messages' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
@@ -103,7 +105,7 @@ const DetailModal = ({ doctor, onClose, onApprove, onReject }) => {
                         <div>
                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Uploaded Documents</p>
                             <div className="space-y-2">
-                                {doctor.documents.map((doc, i) => (
+                                {(doctor.documents || []).map((doc, i) => (
                                     <div key={i} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl border border-gray-100">
                                         <div className="flex items-center gap-3">
                                             <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center border border-primary-100">

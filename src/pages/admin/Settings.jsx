@@ -4,7 +4,8 @@ import {
     Activity, Users, Calendar, Settings, LogOut, Shield, Save,
     UserCheck, BarChart3, CreditCard, LayoutDashboard, Bell,
     Lock, Globe, Mail, Eye, EyeOff, Palette, Database,
-    Server, ToggleLeft, ToggleRight, AlertTriangle
+    Server, ToggleLeft, ToggleRight, AlertTriangle, Stethoscope,
+    Heart, Megaphone
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -13,9 +14,11 @@ import { getSettings, updateSettings } from '../../api/adminAPI';
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
     { icon: UserCheck, label: 'Doctor Approvals', path: '/admin/approvals' },
-    { icon: Users, label: 'User Management', path: '/admin/users' },
+    { icon: Heart, label: 'Patients', path: '/admin/patients' },
+    { icon: Stethoscope, label: 'Doctors', path: '/admin/doctors' },
     { icon: Calendar, label: 'Appointments', path: '/admin/appointments' },
     { icon: CreditCard, label: 'Payments', path: '/admin/payments' },
+    { icon: Megaphone, label: 'Announcements', path: '/admin/announcements' },
     { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
     { icon: Mail, label: 'Contact Messages', path: '/admin/contact-messages' },
     { icon: Settings, label: 'Settings', path: '/admin/settings', active: true },

@@ -4,7 +4,7 @@ import {
     Activity, Users, Calendar, Settings, LogOut, Shield,
     UserCheck, BarChart3, CreditCard, LayoutDashboard,
     TrendingUp, ArrowUpRight, Star, Stethoscope, DollarSign,
-    Clock, CheckCircle2, MapPin, Mail
+    Clock, CheckCircle2, MapPin, Mail, Heart, Megaphone
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -13,10 +13,12 @@ import { getReports } from '../../api/adminAPI';
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
     { icon: UserCheck, label: 'Doctor Approvals', path: '/admin/approvals' },
-    { icon: Users, label: 'User Management', path: '/admin/users' },
+    { icon: Heart, label: 'Patients', path: '/admin/patients' },
+    { icon: Stethoscope, label: 'Doctors', path: '/admin/doctors' },
     { icon: Calendar, label: 'Appointments', path: '/admin/appointments' },
     { icon: CreditCard, label: 'Payments', path: '/admin/payments' },
     { icon: BarChart3, label: 'Reports', path: '/admin/reports', active: true },
+    { icon: Megaphone, label: 'Announcements', path: '/admin/announcements' },
     { icon: Mail, label: 'Contact Messages', path: '/admin/contact-messages' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];

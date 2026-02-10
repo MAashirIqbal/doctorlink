@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getAppointmentDetail, acceptAppointment, rejectAppointment, completeAppointment } from '../../api/appointmentAPI';
+import { getAppointmentDetail, acceptAppointment, rejectAppointment, completeAppointment, markNoShow, acceptReschedule, rejectReschedule } from '../../api/appointmentAPI';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard' },
@@ -24,6 +24,9 @@ const statusConfig = {
     pending: { color: 'bg-amber-50 text-amber-700 border-amber-100', icon: AlertCircle, label: 'Pending' },
     completed: { color: 'bg-primary-50 text-primary-700 border-primary-100', icon: CheckCircle2, label: 'Completed' },
     cancelled: { color: 'bg-red-50 text-red-600 border-red-100', icon: XCircle, label: 'Cancelled' },
+    'no-show': { color: 'bg-orange-50 text-orange-700 border-orange-100', icon: AlertCircle, label: 'No-Show' },
+    rescheduling: { color: 'bg-blue-50 text-blue-700 border-blue-100', icon: Clock, label: 'Reschedule Pending' },
+    expired: { color: 'bg-gray-100 text-gray-500 border-gray-200', icon: XCircle, label: 'Expired' },
 };
 
 const DoctorAppointmentDetail = () => {
@@ -78,6 +81,35 @@ const DoctorAppointmentDetail = () => {
         setActionLoading(true);
         try {
             await completeAppointment(id);
+            await fetchDetail();
+        } catch (err) { alert(err.response?.data?.message || 'Failed'); }
+        setActionLoading(false);
+    };
+
+    const handleNoShow = async () => {
+        if (!window.confirm('Mark this appointment as no-show? The patient will be notified.')) return;
+        setActionLoading(true);
+        try {
+            await markNoShow(id);
+            await fetchDetail();
+        } catch (err) { alert(err.response?.data?.message || 'Failed'); }
+        setActionLoading(false);
+    };
+
+    const handleAcceptReschedule = async () => {
+        setActionLoading(true);
+        try {
+            await acceptReschedule(id);
+            await fetchDetail();
+        } catch (err) { alert(err.response?.data?.message || 'Failed'); }
+        setActionLoading(false);
+    };
+
+    const handleRejectReschedule = async () => {
+        if (!window.confirm('Reject this reschedule request?')) return;
+        setActionLoading(true);
+        try {
+            await rejectReschedule(id);
             await fetchDetail();
         } catch (err) { alert(err.response?.data?.message || 'Failed'); }
         setActionLoading(false);
@@ -171,7 +203,7 @@ const DoctorAppointmentDetail = () => {
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 flex-wrap">
                                         {appointment.status === 'pending' && (
                                             <>
                                                 <button onClick={handleAccept} disabled={actionLoading} className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-black hover:bg-emerald-700 transition-all disabled:opacity-50">
@@ -183,12 +215,92 @@ const DoctorAppointmentDetail = () => {
                                             </>
                                         )}
                                         {appointment.status === 'confirmed' && (
-                                            <button onClick={handleComplete} disabled={actionLoading} className="px-4 py-2 bg-primary-700 text-white rounded-xl text-xs font-black hover:bg-primary-800 transition-all disabled:opacity-50">
-                                                Mark Complete
-                                            </button>
+                                            <>
+                                                <button onClick={handleComplete} disabled={actionLoading} className="px-4 py-2 bg-primary-700 text-white rounded-xl text-xs font-black hover:bg-primary-800 transition-all disabled:opacity-50">
+                                                    Mark Complete
+                                                </button>
+                                                {new Date(appointment.date) < new Date() && (
+                                                    <button onClick={handleNoShow} disabled={actionLoading} className="px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-black hover:bg-orange-600 transition-all disabled:opacity-50">
+                                                        Mark No-Show
+                                                    </button>
+                                                )}
+                                            </>
+                                        )}
+                                        {appointment.status === 'rescheduling' && (
+                                            <>
+                                                <button onClick={handleAcceptReschedule} disabled={actionLoading} className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-black hover:bg-emerald-700 transition-all disabled:opacity-50">
+                                                    Accept Reschedule
+                                                </button>
+                                                <button onClick={handleRejectReschedule} disabled={actionLoading} className="px-4 py-2 bg-red-500 text-white rounded-xl text-xs font-black hover:bg-red-600 transition-all disabled:opacity-50">
+                                                    Reject Reschedule
+                                                </button>
+                                            </>
                                         )}
                                     </div>
                                 </motion.div>
+
+                                {/* Reschedule Request Info */}
+                                {appointment.status === 'rescheduling' && appointment.pendingReschedule && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 15 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.03 }}
+                                        className="bg-blue-50 rounded-2xl border border-blue-200 p-5"
+                                    >
+                                        <h3 className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-3">Reschedule Request</h3>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Current Slot</span>
+                                                <p className="text-sm font-black text-blue-900 mt-1">{new Date(appointment.date).toLocaleDateString()} — {appointment.timeSlot}</p>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Requested Slot</span>
+                                                <p className="text-sm font-black text-blue-900 mt-1">{new Date(appointment.pendingReschedule.date).toLocaleDateString()} — {appointment.pendingReschedule.timeSlot}</p>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs font-bold text-blue-500 mt-3">Reschedule attempt {(appointment.rescheduleCount || 0) + 1} of {appointment.maxReschedules || 2}</p>
+                                    </motion.div>
+                                )}
+
+                                {/* No-Show / Expired Info */}
+                                {appointment.status === 'no-show' && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 15 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.03 }}
+                                        className="bg-orange-50 rounded-2xl border border-orange-200 p-5"
+                                    >
+                                        <h3 className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-2">No-Show Details</h3>
+                                        <p className="text-sm font-bold text-orange-700">Patient did not attend. Marked {appointment.noShowMarkedBy === 'system' ? 'automatically by system' : 'by you'}.</p>
+                                        <p className="text-xs font-bold text-orange-500 mt-1">Reschedule attempts remaining: {(appointment.maxReschedules || 2) - (appointment.rescheduleCount || 0)}</p>
+                                    </motion.div>
+                                )}
+
+                                {/* Reschedule History */}
+                                {appointment.rescheduleHistory?.length > 0 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 15 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.04 }}
+                                        className="bg-white rounded-2xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-5"
+                                    >
+                                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Reschedule History</h3>
+                                        <div className="space-y-2">
+                                            {appointment.rescheduleHistory.map((entry, i) => (
+                                                <div key={i} className="flex items-center justify-between text-xs py-2 border-b border-gray-50 last:border-0">
+                                                    <div>
+                                                        <span className="font-bold text-gray-500">{new Date(entry.fromDate).toLocaleDateString()} {entry.fromTimeSlot}</span>
+                                                        <span className="mx-2 text-gray-300">→</span>
+                                                        <span className="font-bold text-gray-700">{new Date(entry.toDate).toLocaleDateString()} {entry.toTimeSlot}</span>
+                                                    </div>
+                                                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${entry.status === 'accepted' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}`}>
+                                                        {entry.status}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                )}
 
                                 {/* Patient Info */}
                                 <motion.div

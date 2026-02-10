@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getDoctorAppointments, acceptAppointment, rejectAppointment, completeAppointment } from '../../api/appointmentAPI';
+import { getDoctorAppointments, acceptAppointment, rejectAppointment, completeAppointment, markNoShow, acceptReschedule, rejectReschedule } from '../../api/appointmentAPI';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard' },
@@ -23,6 +23,9 @@ const statusConfig = {
     pending: { color: 'bg-amber-50 text-amber-700 border-amber-100', icon: AlertCircle, label: 'Pending' },
     completed: { color: 'bg-primary-50 text-primary-700 border-primary-100', icon: CheckCircle2, label: 'Completed' },
     cancelled: { color: 'bg-red-50 text-red-600 border-red-100', icon: XCircle, label: 'Cancelled' },
+    'no-show': { color: 'bg-orange-50 text-orange-700 border-orange-100', icon: AlertCircle, label: 'No-Show' },
+    rescheduling: { color: 'bg-blue-50 text-blue-700 border-blue-100', icon: Clock, label: 'Reschedule Pending' },
+    expired: { color: 'bg-gray-100 text-gray-500 border-gray-200', icon: XCircle, label: 'Expired' },
 };
 
 const DoctorAppointments = () => {
@@ -47,6 +50,9 @@ const DoctorAppointments = () => {
     const handleAccept = async (id) => { try { await acceptAppointment(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
     const handleReject = async (id) => { try { await rejectAppointment(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
     const handleComplete = async (id) => { try { await completeAppointment(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
+    const handleNoShow = async (id) => { if (!window.confirm('Mark this appointment as no-show? The patient will be notified.')) return; try { await markNoShow(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
+    const handleAcceptReschedule = async (id) => { try { await acceptReschedule(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
+    const handleRejectReschedule = async (id) => { if (!window.confirm('Reject this reschedule request?')) return; try { await rejectReschedule(id); fetchAppointments(); } catch(e) { alert(e.response?.data?.message || 'Failed'); } };
     const handleLogout = () => { localStorage.setItem('lastRole', 'doctor'); logout(); navigate('/'); };
 
     const tabs = [
@@ -54,6 +60,8 @@ const DoctorAppointments = () => {
         { key: 'pending', label: 'Pending' },
         { key: 'confirmed', label: 'Confirmed' },
         { key: 'completed', label: 'Completed' },
+        { key: 'no-show', label: 'No-Show' },
+        { key: 'rescheduling', label: 'Rescheduling' },
         { key: 'cancelled', label: 'Cancelled' },
     ];
 
@@ -223,7 +231,7 @@ const DoctorAppointments = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-2 flex-wrap">
                                                     {apt.status === 'pending' && (
                                                         <>
                                                             <button onClick={() => handleAccept(apt._id)} className="flex items-center gap-1.5 px-5 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl text-xs font-black hover:bg-emerald-100 transition-all active:scale-95">
@@ -237,10 +245,36 @@ const DoctorAppointments = () => {
                                                         </>
                                                     )}
                                                     {apt.status === 'confirmed' && (
-                                                        <button onClick={() => handleComplete(apt._id)} className="flex items-center gap-1.5 px-5 py-2.5 bg-primary-50 text-primary-700 border border-primary-100 rounded-xl text-xs font-black hover:bg-primary-100 transition-all active:scale-95">
-                                                            <CheckCircle2 size={14} />
-                                                            Complete
-                                                        </button>
+                                                        <>
+                                                            <button onClick={() => handleComplete(apt._id)} className="flex items-center gap-1.5 px-5 py-2.5 bg-primary-50 text-primary-700 border border-primary-100 rounded-xl text-xs font-black hover:bg-primary-100 transition-all active:scale-95">
+                                                                <CheckCircle2 size={14} />
+                                                                Complete
+                                                            </button>
+                                                            {new Date(apt.date) < new Date() && (
+                                                                <button onClick={() => handleNoShow(apt._id)} className="flex items-center gap-1.5 px-4 py-2.5 bg-orange-50 text-orange-700 border border-orange-100 rounded-xl text-xs font-black hover:bg-orange-100 transition-all active:scale-95">
+                                                                    <AlertCircle size={14} />
+                                                                    No-Show
+                                                                </button>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                    {apt.status === 'rescheduling' && (
+                                                        <>
+                                                            <div className="text-xs font-bold text-blue-600 mr-2">
+                                                                New: {apt.pendingReschedule?.date ? new Date(apt.pendingReschedule.date).toLocaleDateString() : ''} {apt.pendingReschedule?.timeSlot}
+                                                            </div>
+                                                            <button onClick={() => handleAcceptReschedule(apt._id)} className="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl text-xs font-black hover:bg-emerald-100 transition-all active:scale-95">
+                                                                <CheckCircle2 size={14} />
+                                                                Accept
+                                                            </button>
+                                                            <button onClick={() => handleRejectReschedule(apt._id)} className="flex items-center gap-1.5 px-4 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl text-xs font-black hover:bg-red-100 transition-all active:scale-95">
+                                                                <XCircle size={14} />
+                                                                Reject
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                    {apt.status === 'no-show' && (
+                                                        <span className="text-xs font-bold text-orange-600">Reschedules left: {(apt.maxReschedules || 2) - (apt.rescheduleCount || 0)}</span>
                                                     )}
                                                     <Link to={`/doctor/appointments/${apt._id}`} className="flex items-center gap-1.5 px-4 py-2.5 bg-gray-50 text-gray-600 border border-gray-100 rounded-xl text-xs font-black hover:bg-gray-100 transition-all active:scale-95">
                                                         <Eye size={14} />

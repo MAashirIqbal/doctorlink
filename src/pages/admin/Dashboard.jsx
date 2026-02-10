@@ -14,9 +14,11 @@ import { getAdminDashboard, getPendingDoctors, approveDoctor, rejectDoctor, getA
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard', active: true },
     { icon: UserCheck, label: 'Doctor Approvals', path: '/admin/approvals' },
-    { icon: Users, label: 'User Management', path: '/admin/users' },
+    { icon: Users, label: 'Patients', path: '/admin/patients' },
+    { icon: Stethoscope, label: 'Doctors', path: '/admin/doctors' },
     { icon: Calendar, label: 'Appointments', path: '/admin/appointments' },
     { icon: CreditCard, label: 'Payments', path: '/admin/payments' },
+    { icon: Bell, label: 'Announcements', path: '/admin/announcements' },
     { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
     { icon: Mail, label: 'Contact Messages', path: '/admin/contact-messages' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
@@ -321,13 +323,13 @@ const AdminDashboard = () => {
                                 className="bg-white rounded-3xl border border-gray-200/60 shadow-sm shadow-gray-200/50 overflow-hidden"
                             >
                                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                                    <h3 className="text-lg font-black text-gray-900 font-display">Recent Users</h3>
-                                    <Link to="/admin/users" className="text-xs font-black text-primary-700 uppercase tracking-widest">
+                                    <h3 className="text-lg font-black text-gray-900 font-display">Recent Patients</h3>
+                                    <Link to="/admin/patients" className="text-xs font-black text-primary-700 uppercase tracking-widest">
                                         Manage
                                     </Link>
                                 </div>
                                 <div className="divide-y divide-gray-50">
-                                    {recentUsers.length === 0 && <p className="p-6 text-center text-gray-400 font-bold">No users yet</p>}
+                                    {recentUsers.length === 0 && <p className="p-6 text-center text-gray-400 font-bold">No patients yet</p>}
                                     {recentUsers.map((u) => (
                                         <div key={u._id} className="flex items-center gap-3 p-4 hover:bg-gray-50/50 transition-colors">
                                             <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-sm border border-white shadow-sm">{u.name?.[0] || 'U'}</div>
@@ -389,9 +391,9 @@ const AdminDashboard = () => {
                                 <div className="space-y-2">
                                     {[
                                         { icon: UserCheck, label: 'Review Approvals', path: '/admin/approvals', color: 'text-emerald-700' },
-                                        { icon: Users, label: 'Manage Users', path: '/admin/users', color: 'text-primary-700' },
+                                        { icon: Users, label: 'Manage Patients', path: '/admin/patients', color: 'text-primary-700' },
+                                        { icon: Stethoscope, label: 'Manage Doctors', path: '/admin/doctors', color: 'text-primary-700' },
                                         { icon: BarChart3, label: 'View Reports', path: '/admin/reports', color: 'text-amber-600' },
-                                        { icon: CreditCard, label: 'Payment History', path: '/admin/payments', color: 'text-primary-700' },
                                     ].map((action, i) => (
                                         <Link key={i} to={action.path} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-primary-50 hover:border-primary-100 transition-all group">
                                             <div className="flex items-center gap-3">

@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getPatientDashboard, getMyAppointments } from '../../api/appointmentAPI';
 import NotificationDropdown from '../../components/NotificationDropdown';
+import AnnouncementBanner from '../../components/AnnouncementBanner';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/patient/dashboard', active: true },
@@ -140,6 +141,8 @@ const PatientDashboard = () => {
                         </div>
                     </div>
                 </header>
+
+                <AnnouncementBanner />
 
                 <div className="p-8">
                     {/* Quick Stats */}

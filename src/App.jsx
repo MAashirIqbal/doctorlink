@@ -26,11 +26,17 @@ import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminApprovals from './pages/admin/Approvals';
 import AdminUsers from './pages/admin/Users';
+import AdminPatients from './pages/admin/Patients';
+import AdminPatientDetail from './pages/admin/PatientDetail';
+import AdminDoctors from './pages/admin/Doctors';
+import AdminDoctorDetail from './pages/admin/DoctorDetail';
 import AdminAppointments from './pages/admin/Appointments';
+import AdminAppointmentDetail from './pages/admin/AppointmentDetail';
 import AdminPayments from './pages/admin/Payments';
 import AdminReports from './pages/admin/Reports';
 import AdminSettings from './pages/admin/Settings';
 import AdminContactMessages from './pages/admin/ContactMessages';
+import AdminAnnouncements from './pages/admin/Announcements';
 
 
 function App() {
@@ -71,9 +77,15 @@ function App() {
           <Route path="/admin/dashboard" element={<ProtectedRoute roles={['admin']}><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/approvals" element={<ProtectedRoute roles={['admin']}><AdminApprovals /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute roles={['admin']}><AdminUsers /></ProtectedRoute>} />
+          <Route path="/admin/patients" element={<ProtectedRoute roles={['admin']}><AdminPatients /></ProtectedRoute>} />
+          <Route path="/admin/patients/:id" element={<ProtectedRoute roles={['admin']}><AdminPatientDetail /></ProtectedRoute>} />
+          <Route path="/admin/doctors" element={<ProtectedRoute roles={['admin']}><AdminDoctors /></ProtectedRoute>} />
+          <Route path="/admin/doctors/:id" element={<ProtectedRoute roles={['admin']}><AdminDoctorDetail /></ProtectedRoute>} />
           <Route path="/admin/appointments" element={<ProtectedRoute roles={['admin']}><AdminAppointments /></ProtectedRoute>} />
+          <Route path="/admin/appointments/:id" element={<ProtectedRoute roles={['admin']}><AdminAppointmentDetail /></ProtectedRoute>} />
           <Route path="/admin/payments" element={<ProtectedRoute roles={['admin']}><AdminPayments /></ProtectedRoute>} />
           <Route path="/admin/reports" element={<ProtectedRoute roles={['admin']}><AdminReports /></ProtectedRoute>} />
+          <Route path="/admin/announcements" element={<ProtectedRoute roles={['admin']}><AdminAnnouncements /></ProtectedRoute>} />
           <Route path="/admin/contact-messages" element={<ProtectedRoute roles={['admin']}><AdminContactMessages /></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute roles={['admin']}><AdminSettings /></ProtectedRoute>} />
         </Routes>

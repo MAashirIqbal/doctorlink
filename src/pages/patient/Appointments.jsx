@@ -24,6 +24,9 @@ const statusConfig = {
     pending: { color: 'bg-amber-50 text-amber-700 border-amber-100', icon: AlertCircle, label: 'Pending' },
     completed: { color: 'bg-primary-50 text-primary-700 border-primary-100', icon: CheckCircle2, label: 'Completed' },
     cancelled: { color: 'bg-red-50 text-red-600 border-red-100', icon: XCircle, label: 'Cancelled' },
+    'no-show': { color: 'bg-orange-50 text-orange-700 border-orange-100', icon: AlertCircle, label: 'No-Show' },
+    rescheduling: { color: 'bg-blue-50 text-blue-700 border-blue-100', icon: Clock, label: 'Rescheduling' },
+    expired: { color: 'bg-gray-100 text-gray-500 border-gray-200', icon: XCircle, label: 'Expired' },
 };
 
 const RatingModal = ({ isOpen, onClose, doctor, appointmentId, doctorId, onSubmit }) => {

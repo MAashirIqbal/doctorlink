@@ -11,6 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getDoctorDashboard, getMyEarnings, getDoctorReviews } from '../../api/doctorAPI';
 import { getDoctorAppointments, acceptAppointment, rejectAppointment } from '../../api/appointmentAPI';
 import NotificationDropdown from '../../components/NotificationDropdown';
+import AnnouncementBanner from '../../components/AnnouncementBanner';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard', active: true },
@@ -148,6 +149,8 @@ const DoctorDashboard = () => {
                         </div>
                     </div>
                 </header>
+
+                <AnnouncementBanner />
 
                 <div className="p-8">
                     {/* Quick Stats */}
