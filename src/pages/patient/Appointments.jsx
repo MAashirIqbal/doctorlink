@@ -323,9 +323,13 @@ const PatientAppointments = () => {
                                     className="bg-white rounded-2xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-6 hover:border-primary-100 hover:shadow-lg hover:shadow-primary-900/5 transition-all duration-300"
                                 >
                                     <div className="flex flex-col sm:flex-row items-start gap-5">
-                                        <div className="w-16 h-16 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-xl border-2 border-white shadow-md">
-                                            {apt.doctor?.fullName?.[0] || 'D'}
-                                        </div>
+                                        {apt.doctor?.avatar ? (
+                                            <img src={apt.doctor.avatar} alt={apt.doctor.fullName} className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-md" />
+                                        ) : (
+                                            <div className="w-16 h-16 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-xl border-2 border-white shadow-md">
+                                                {apt.doctor?.fullName?.[0] || 'D'}
+                                            </div>
+                                        )}
 
                                         <div className="flex-1 min-w-0">
                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
@@ -400,8 +404,8 @@ const PatientAppointments = () => {
                                                             Pay Now
                                                         </button>
                                                     )}
-                                                    <Link to={`/doctors/${apt.doctor?._id}`} className="flex items-center gap-2 px-5 py-2.5 bg-primary-50 text-primary-700 border border-primary-100 rounded-xl font-black text-xs hover:bg-primary-100 transition-all">
-                                                        View Doctor
+                                                    <Link to={`/patient/appointments/${apt._id}`} className="flex items-center gap-2 px-5 py-2.5 bg-primary-50 text-primary-700 border border-primary-100 rounded-xl font-black text-xs hover:bg-primary-100 transition-all">
+                                                        View Details
                                                         <ArrowRight size={12} />
                                                     </Link>
                                                 </div>

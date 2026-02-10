@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     User, Mail, Phone, MapPin, Briefcase, CreditCard, Clock,
-    Camera, Save, Activity, Calendar, Users, Wallet, Settings,
+    Camera, Save, Activity, Calendar, Users, Wallet,
     LogOut, Stethoscope, ClipboardList, Plus, X, CheckCircle2,
     GraduationCap, Languages, Award, Globe
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getMyDoctorProfile, updateMyDoctorProfile } from '../../api/doctorAPI';
+import { getMyDoctorProfile, updateMyDoctorProfile, updateMySchedule } from '../../api/doctorAPI';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard' },
@@ -17,7 +17,6 @@ const sidebarLinks = [
     { icon: Wallet, label: 'Earnings', path: '/doctor/earnings' },
     { icon: ClipboardList, label: 'Schedule', path: '/doctor/schedule' },
     { icon: User, label: 'Profile', path: '/doctor/profile', active: true },
-    { icon: Settings, label: 'Settings', path: '/doctor/settings' },
 ];
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -92,6 +91,13 @@ const DoctorProfile = () => {
 
     const handleLogout = () => { localStorage.setItem('lastRole', 'doctor'); logout(); navigate('/'); };
 
+    const handleAddLanguage = () => {
+        const lang = prompt('Enter language name:');
+        if (lang && lang.trim() && !profile.languages.includes(lang.trim())) {
+            setProfile({ ...profile, languages: [...profile.languages, lang.trim()] });
+        }
+    };
+
     const handleSave = async () => {
         try {
             await updateMyDoctorProfile({
@@ -105,6 +111,16 @@ const DoctorProfile = () => {
                 languages: profile.languages,
                 avatar: avatarData,
             });
+
+            // Also save availability/schedule
+            const schedulePayload = Object.entries(availability).map(([day, val]) => ({
+                day,
+                isActive: val.enabled,
+                startTime: val.start,
+                endTime: val.end,
+            }));
+            await updateMySchedule({ schedule: schedulePayload });
+
             updateUser({
                 ...(user || {}),
                 name: profile.name,
@@ -340,7 +356,7 @@ const DoctorProfile = () => {
                                             </button>
                                         </span>
                                     ))}
-                                    <button className="flex items-center gap-1.5 px-4 py-2 bg-gray-50 text-gray-500 rounded-xl text-sm font-black border border-gray-100 border-dashed hover:bg-primary-50 hover:text-primary-700 hover:border-primary-200 transition-all">
+                                    <button onClick={handleAddLanguage} className="flex items-center gap-1.5 px-4 py-2 bg-gray-50 text-gray-500 rounded-xl text-sm font-black border border-gray-100 border-dashed hover:bg-primary-50 hover:text-primary-700 hover:border-primary-200 transition-all">
                                         <Plus size={12} />
                                         Add Language
                                     </button>

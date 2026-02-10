@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     Calendar, Clock, User, Bell, Search, ArrowRight, Star,
-    Activity, Settings, LogOut, Stethoscope, DollarSign,
+    Activity, LogOut, Stethoscope, DollarSign,
     ChevronRight, TrendingUp, CalendarCheck, Users, CheckCircle2,
     XCircle, AlertCircle, BarChart3, Wallet, ClipboardList
 } from 'lucide-react';
@@ -19,8 +19,14 @@ const sidebarLinks = [
     { icon: Wallet, label: 'Earnings', path: '/doctor/earnings' },
     { icon: ClipboardList, label: 'Schedule', path: '/doctor/schedule' },
     { icon: User, label: 'Profile', path: '/doctor/profile' },
-    { icon: Settings, label: 'Settings', path: '/doctor/settings' },
 ];
+
+const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good Morning';
+    if (h < 17) return 'Good Afternoon';
+    return 'Good Evening';
+};
 
 const DoctorDashboard = () => {
     const { user, logout } = useAuth();
@@ -119,7 +125,7 @@ const DoctorDashboard = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-2xl font-black text-gray-900 font-display tracking-tight">
-                                Good Morning, <span className="text-primary-700">{user?.name?.split(' ')[0]}</span>
+                                {getGreeting()}, <span className="text-primary-700">{user?.name?.split(' ')[0]}</span>
                             </h1>
                             <p className="text-sm font-bold text-gray-400 mt-0.5">You have <span className="text-emerald-600 font-black">{todayAppointments.length} appointments</span> today</p>
                         </div>
@@ -187,7 +193,11 @@ const DoctorDashboard = () => {
                                                     <p className="text-sm font-black text-gray-900">{apt.timeSlot}</p>
                                                 </div>
                                                 <div className="w-px h-10 bg-gray-100" />
-                                                <div className="w-11 h-11 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-sm border-2 border-white shadow-sm">{apt.patient?.name?.[0] || 'P'}</div>
+                                                {apt.patient?.avatar ? (
+                                                    <img src={apt.patient.avatar} alt={apt.patient.name} className="w-11 h-11 rounded-xl object-cover border-2 border-white shadow-sm" />
+                                                ) : (
+                                                    <div className="w-11 h-11 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-sm border-2 border-white shadow-sm">{apt.patient?.name?.[0] || 'P'}</div>
+                                                )}
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2">
                                                         <h3 className="font-black text-gray-900 text-sm">{apt.patient?.name || 'Patient'}</h3>
@@ -242,10 +252,10 @@ const DoctorDashboard = () => {
                                             <Wallet size={22} className="text-white" />
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-2 text-emerald-300 text-sm font-black">
+                                    <Link to="/doctor/earnings" className="flex items-center gap-2 text-emerald-300 text-sm font-black hover:text-white transition-colors">
                                         <TrendingUp size={14} />
-                                        <span>+12% from last month</span>
-                                    </div>
+                                        <span>View Full Report</span>
+                                    </Link>
                                 </div>
                             </motion.div>
 

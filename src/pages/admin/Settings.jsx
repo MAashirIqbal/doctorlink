@@ -53,7 +53,8 @@ const AdminSettings = () => {
         autoApprove: false,
         maxAppointmentsPerDay: 20,
         cancellationWindow: 24,
-        platformFeePercent: 10,
+        patientPlatformFeePercent: 0,
+        doctorPlatformFeePercent: 10,
         minDoctorFee: 500,
         maxDoctorFee: 10000,
     });
@@ -312,17 +313,35 @@ const AdminSettings = () => {
                             </div>
 
                             <div className="bg-white rounded-3xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-8">
-                                <h3 className="text-lg font-black text-gray-900 font-display mb-6">Fee Configuration</h3>
-                                <div className="grid grid-cols-3 gap-6">
+                                <h3 className="text-lg font-black text-gray-900 font-display mb-2">Fee Configuration</h3>
+                                <p className="text-sm font-bold text-gray-400 mb-6">Control platform fees charged to patients and doctors separately</p>
+                                <div className="grid grid-cols-2 gap-6 mb-6">
                                     <div>
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Platform Fee (%)</label>
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Patient Platform Fee (%)</label>
                                         <input
                                             type="number"
-                                            value={settings.platformFeePercent}
-                                            onChange={(e) => updateSetting('platformFeePercent', parseInt(e.target.value))}
+                                            min="0"
+                                            max="50"
+                                            value={settings.patientPlatformFeePercent}
+                                            onChange={(e) => updateSetting('patientPlatformFeePercent', parseInt(e.target.value) || 0)}
                                             className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3.5 px-4 text-gray-900 font-bold text-sm focus:outline-none focus:border-primary-200 transition-all"
                                         />
+                                        <p className="text-[10px] font-bold text-gray-400 mt-1.5">Added on top of consultation fee. Set 0 for free.</p>
                                     </div>
+                                    <div>
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Doctor Platform Fee (%)</label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="50"
+                                            value={settings.doctorPlatformFeePercent}
+                                            onChange={(e) => updateSetting('doctorPlatformFeePercent', parseInt(e.target.value) || 0)}
+                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3.5 px-4 text-gray-900 font-bold text-sm focus:outline-none focus:border-primary-200 transition-all"
+                                        />
+                                        <p className="text-[10px] font-bold text-gray-400 mt-1.5">Deducted from doctor's earnings per appointment.</p>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-6">
                                     <div>
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Min Doctor Fee (PKR)</label>
                                         <input

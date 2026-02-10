@@ -354,7 +354,7 @@ const BookAppointment = () => {
                                         </div>
                                         <div className="flex justify-between text-sm mb-3">
                                             <span className="font-bold text-gray-500">Platform Fee</span>
-                                            <span className="font-black text-emerald-600">Free</span>
+                                            <span className="font-black text-emerald-600">Rs. 0</span>
                                         </div>
                                         <div className="border-t border-gray-200 pt-3 flex justify-between">
                                             <span className="font-black text-gray-900 uppercase tracking-wider text-sm">Total</span>

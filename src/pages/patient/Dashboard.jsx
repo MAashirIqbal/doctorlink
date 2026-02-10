@@ -187,7 +187,8 @@ const PatientDashboard = () => {
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: 0.2 + i * 0.1 }}
-                                            className="p-6 hover:bg-primary-50/30 transition-colors"
+                                            onClick={() => navigate(`/patient/appointments/${apt._id}`)}
+                                            className="p-6 hover:bg-primary-50/30 transition-colors cursor-pointer"
                                         >
                                             <div className="flex items-start gap-4">
                                                 {apt.doctor?.avatar ? (

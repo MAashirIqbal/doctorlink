@@ -8,7 +8,7 @@ import {
 import { Link, useParams } from 'react-router-dom';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
-import { getDoctor } from '../../api/doctorAPI';
+import { getDoctor, getDoctorSlots } from '../../api/doctorAPI';
 import { getDoctorReviews } from '../../api/reviewAPI';
 
 const parseSlotHour = (slot) => {
@@ -42,6 +42,7 @@ const getUpcomingSchedule = (schedule) => {
                 result.push({
                     day: dayName,
                     date: d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
+                    dateObj: d,
                     slots,
                     isToday,
                 });
@@ -57,6 +58,7 @@ const DoctorProfile = () => {
     const [doctor, setDoctor] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [scheduleDisplay, setScheduleDisplay] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -65,8 +67,25 @@ const DoctorProfile = () => {
                     getDoctor(id),
                     getDoctorReviews(id),
                 ]);
-                setDoctor(docRes.data.doctor);
+                const doc = docRes.data.doctor;
+                setDoctor(doc);
                 setReviews(revRes.data.reviews);
+
+                // Build schedule with booked slots filtered out
+                const upcoming = getUpcomingSchedule(doc.schedule);
+                const withBooked = await Promise.all(
+                    upcoming.map(async (entry) => {
+                        try {
+                            const { data } = await getDoctorSlots(id, { date: entry.dateObj.toISOString() });
+                            const booked = data.bookedSlots || [];
+                            const available = entry.slots.filter(s => !booked.includes(s));
+                            return { ...entry, slots: available };
+                        } catch {
+                            return entry;
+                        }
+                    })
+                );
+                setScheduleDisplay(withBooked.filter(e => e.slots.length > 0));
             } catch (err) {
                 console.error('Failed to load doctor:', err);
             }
@@ -308,7 +327,7 @@ const DoctorProfile = () => {
                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Available Schedule</p>
 
                                     <div className="space-y-2.5 mb-5">
-                                        {getUpcomingSchedule(doctor.schedule).map((dateObj, i) => (
+                                        {scheduleDisplay.map((dateObj, i) => (
                                             <div key={i} className="bg-gray-50/80 rounded-xl p-3 border border-gray-100/80">
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <span className="text-[10px] font-black text-primary-700 bg-primary-50 px-2 py-0.5 rounded-md border border-primary-100 uppercase tracking-wider">{dateObj.day.slice(0, 3)}</span>
@@ -326,7 +345,7 @@ const DoctorProfile = () => {
                                                 </div>
                                             </div>
                                         ))}
-                                        {getUpcomingSchedule(doctor.schedule).length === 0 && (
+                                        {scheduleDisplay.length === 0 && (
                                             <p className="text-sm font-bold text-gray-400 text-center py-4">No upcoming slots available</p>
                                         )}
                                     </div>

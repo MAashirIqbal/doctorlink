@@ -12,6 +12,7 @@ import Contact from './pages/public/Contact';
 import About from './pages/public/About';
 import PatientDashboard from './pages/patient/Dashboard';
 import PatientAppointments from './pages/patient/Appointments';
+import AppointmentDetail from './pages/patient/AppointmentDetail';
 import BookAppointment from './pages/patient/BookAppointment';
 import PatientProfile from './pages/patient/Profile';
 import DoctorDashboard from './pages/doctor/Dashboard';
@@ -51,6 +52,7 @@ function App() {
           {/* Patient Routes */}
           <Route path="/patient/dashboard" element={<ProtectedRoute roles={['patient']}><PatientDashboard /></ProtectedRoute>} />
           <Route path="/patient/appointments" element={<ProtectedRoute roles={['patient']}><PatientAppointments /></ProtectedRoute>} />
+          <Route path="/patient/appointments/:id" element={<ProtectedRoute roles={['patient']}><AppointmentDetail /></ProtectedRoute>} />
           <Route path="/patient/profile" element={<ProtectedRoute roles={['patient']}><PatientProfile /></ProtectedRoute>} />
           <Route path="/book-appointment/:id" element={<ProtectedRoute roles={['patient']}><BookAppointment /></ProtectedRoute>} />
 

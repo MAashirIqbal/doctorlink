@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-    Calendar, Clock, User, Search, Activity, Settings, LogOut,
+    Calendar, Clock, User, Search, Activity, LogOut,
     Users, Wallet, ClipboardList, Stethoscope, Phone, Mail,
     ChevronRight, Eye, MapPin
 } from 'lucide-react';
@@ -16,7 +16,6 @@ const sidebarLinks = [
     { icon: Wallet, label: 'Earnings', path: '/doctor/earnings' },
     { icon: ClipboardList, label: 'Schedule', path: '/doctor/schedule' },
     { icon: User, label: 'Profile', path: '/doctor/profile' },
-    { icon: Settings, label: 'Settings', path: '/doctor/settings' },
 ];
 
 const DoctorPatients = () => {
@@ -76,7 +75,11 @@ const DoctorPatients = () => {
                 </nav>
                 <div className="p-4 border-t border-gray-50">
                     <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer">
-                        <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
+                        {user?.avatar ? (
+                            <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                        ) : (
+                            <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
+                        )}
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-black text-gray-900 truncate">{user?.name}</p>
                             <p className="text-[10px] font-bold text-primary-700 truncate">{user?.email}</p>
@@ -134,7 +137,11 @@ const DoctorPatients = () => {
                                 className="bg-white rounded-2xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-6 hover:border-primary-100 hover:shadow-lg hover:shadow-primary-900/5 transition-all duration-300"
                             >
                                 <div className="flex items-start gap-4 mb-5">
-                                    <div className="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-lg border-2 border-white shadow-md">{patient.name?.[0] || 'P'}</div>
+                                    {patient.avatar ? (
+                                        <img src={patient.avatar} alt={patient.name} className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-md" />
+                                    ) : (
+                                        <div className="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-lg border-2 border-white shadow-md">{patient.name?.[0] || 'P'}</div>
+                                    )}
                                     <div className="flex-1 min-w-0">
                                         <h3 className="text-lg font-black text-gray-900 truncate">{patient.name}</h3>
                                         <div className="flex items-center gap-2 text-xs font-bold text-gray-400 mt-0.5">
@@ -164,6 +171,12 @@ const DoctorPatients = () => {
                                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Visits</p>
                                             <p className="text-lg font-black text-primary-700">{patient.totalAppointments || 0}</p>
                                         </div>
+                                        {patient.lastVisit && (
+                                            <div>
+                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Last Visit</p>
+                                                <p className="text-sm font-black text-gray-600">{new Date(patient.lastVisit).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>

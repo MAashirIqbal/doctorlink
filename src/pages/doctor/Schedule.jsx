@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-    Calendar, Clock, User, Activity, Settings, LogOut,
+    Calendar, Clock, User, Activity, LogOut,
     Users, Wallet, ClipboardList, Stethoscope, Save,
     CheckCircle2, Plus, X, Trash2
 } from 'lucide-react';
@@ -16,7 +16,6 @@ const sidebarLinks = [
     { icon: Wallet, label: 'Earnings', path: '/doctor/earnings' },
     { icon: ClipboardList, label: 'Schedule', path: '/doctor/schedule', active: true },
     { icon: User, label: 'Profile', path: '/doctor/profile' },
-    { icon: Settings, label: 'Settings', path: '/doctor/settings' },
 ];
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -144,7 +143,11 @@ const DoctorSchedule = () => {
                 </nav>
                 <div className="p-4 border-t border-gray-50">
                     <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer">
-                        <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
+                        {user?.avatar ? (
+                            <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                        ) : (
+                            <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
+                        )}
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-black text-gray-900 truncate">{user?.name}</p>
                             <p className="text-[10px] font-bold text-primary-700 truncate">{user?.email}</p>
