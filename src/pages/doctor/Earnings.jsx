@@ -8,6 +8,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getMyEarnings } from '../../api/doctorAPI';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard' },
@@ -166,6 +167,44 @@ const DoctorEarnings = () => {
                             </div>
                         </div>
                     </motion.div>
+
+                    {/* Monthly Earnings Chart */}
+                    {monthlyData.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.25 }}
+                            className="bg-white rounded-3xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-6 mb-10"
+                        >
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 className="text-lg font-black text-gray-900">Monthly Earnings Trend</h3>
+                                    <p className="text-sm font-bold text-gray-400 mt-0.5">Revenue across months</p>
+                                </div>
+                            </div>
+                            <ResponsiveContainer width="100%" height={260}>
+                                <LineChart
+                                    data={[...monthlyData]
+                                        .sort((a, b) => (a._id || '').localeCompare(b._id || ''))
+                                        .map(m => {
+                                            const [y, mo] = (m._id || '').split('-');
+                                            const label = mo ? new Date(y, parseInt(mo) - 1).toLocaleString('en-US', { month: 'short' }) : m._id;
+                                            return { month: label, earnings: m.total || 0, appts: m.count || 0 };
+                                        })}
+                                    margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                                    <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} fontWeight={700} />
+                                    <YAxis stroke="#9ca3af" fontSize={12} fontWeight={700} tickFormatter={(v) => `Rs.${v >= 1000 ? `${v / 1000}k` : v}`} />
+                                    <Tooltip
+                                        formatter={(v, name) => [name === 'earnings' ? `Rs. ${v.toLocaleString()}` : v, name === 'earnings' ? 'Earnings' : 'Appointments']}
+                                        contentStyle={{ borderRadius: 12, border: '1px solid #e5e7eb', fontWeight: 700 }}
+                                    />
+                                    <Line type="monotone" dataKey="earnings" stroke="#15803d" strokeWidth={3} dot={{ r: 4, fill: '#15803d' }} activeDot={{ r: 6 }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </motion.div>
+                    )}
 
                     {/* Tabs */}
                     <div className="flex gap-2 bg-white rounded-2xl p-1.5 border border-gray-200/60 shadow-sm shadow-gray-200/50 mb-8 w-fit">

@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/public/Landing';
 import Auth from './pages/public/Auth';
 import ForgotPassword from './pages/public/ForgotPassword';
+import ResetPassword from './pages/public/ResetPassword';
 import Legal from './pages/public/Legal';
 import DoctorApply from './pages/public/DoctorApply';
 import Doctors from './pages/public/Doctors';
@@ -51,6 +52,7 @@ function App() {
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/legal" element={<Legal />} />
           <Route path="/apply-doctor" element={<DoctorApply />} />
           <Route path="/doctors" element={<Doctors />} />

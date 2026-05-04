@@ -9,6 +9,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getReports } from '../../api/adminAPI';
+import { ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
@@ -257,6 +258,38 @@ const AdminReports = () => {
                     {activeTab === 'growth' && (
                         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                             <h3 className="text-lg font-black text-gray-900 font-display">Monthly Growth Trends</h3>
+
+                            {/* Chart: revenue (bars) + appointments (line) */}
+                            {monthlyData.length > 0 && (
+                                <div className="bg-white rounded-3xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-6">
+                                    <div className="mb-4">
+                                        <h4 className="text-base font-black text-gray-900">Revenue & Appointments</h4>
+                                        <p className="text-xs font-bold text-gray-400 mt-0.5">Monthly trend across the platform</p>
+                                    </div>
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <ComposedChart
+                                            data={monthlyData.map(m => {
+                                                const [y, mo] = (m.month || '').split('-');
+                                                const label = mo ? new Date(y, parseInt(mo) - 1).toLocaleString('en-US', { month: 'short' }) : m.month;
+                                                return { month: label, revenue: m.revenue || 0, appointments: m.appointments || 0 };
+                                            })}
+                                            margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                                            <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} fontWeight={700} />
+                                            <YAxis yAxisId="left" stroke="#15803d" fontSize={12} fontWeight={700} tickFormatter={(v) => `Rs.${v >= 1000 ? `${v / 1000}k` : v}`} />
+                                            <YAxis yAxisId="right" orientation="right" stroke="#d97706" fontSize={12} fontWeight={700} />
+                                            <Tooltip
+                                                formatter={(v, name) => name === 'revenue' ? [`Rs. ${v.toLocaleString()}`, 'Revenue'] : [v, 'Appointments']}
+                                                contentStyle={{ borderRadius: 12, border: '1px solid #e5e7eb', fontWeight: 700 }}
+                                            />
+                                            <Legend wrapperStyle={{ fontWeight: 700, fontSize: 12 }} />
+                                            <Bar yAxisId="left" dataKey="revenue" fill="#15803d" radius={[8, 8, 0, 0]} />
+                                            <Line yAxisId="right" type="monotone" dataKey="appointments" stroke="#d97706" strokeWidth={3} dot={{ r: 4, fill: '#d97706' }} />
+                                        </ComposedChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            )}
 
                             {/* Monthly Breakdown Cards */}
                             <div className="space-y-4">

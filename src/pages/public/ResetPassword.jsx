@@ -1,26 +1,36 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, ArrowLeft, Send, Sparkles, ShieldCheck } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { forgotPassword } from '../../api/authAPI';
+import { Lock, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { resetPassword } from '../../api/authAPI';
 
-const ForgotPassword = () => {
-    const [email, setEmail] = useState('');
-    const [isSubmitted, setIsSubmitted] = useState(false);
-    const [resetUrl, setResetUrl] = useState('');
+const ResetPassword = () => {
+    const { token } = useParams();
+    const navigate = useNavigate();
+    const [password, setPassword] = useState('');
+    const [confirm, setConfirm] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [done, setDone] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters.');
+            return;
+        }
+        if (password !== confirm) {
+            setError('Passwords do not match.');
+            return;
+        }
         setLoading(true);
         try {
-            const { data } = await forgotPassword({ email });
-            setResetUrl(data.resetUrl || '');
-            setIsSubmitted(true);
+            await resetPassword(token, { password });
+            setDone(true);
+            setTimeout(() => navigate('/login'), 2000);
         } catch (err) {
-            setError(err.response?.data?.message || 'Could not start reset.');
+            setError(err.response?.data?.message || 'Reset failed.');
         } finally {
             setLoading(false);
         }
@@ -28,7 +38,6 @@ const ForgotPassword = () => {
 
     return (
         <div className="min-h-screen bg-[#0a1a15] flex items-center justify-center p-4 relative overflow-hidden font-display">
-            {/* Ambient Background */}
             <div className="absolute inset-0 z-0">
                 <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px]" />
                 <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-primary-700/10 rounded-full blur-[150px]" />
@@ -53,13 +62,13 @@ const ForgotPassword = () => {
                                 <Sparkles size={20} />
                             </motion.div>
                         </div>
-                        <h2 className="text-3xl font-black text-white mb-3">Forgot Password?</h2>
+                        <h2 className="text-3xl font-black text-white mb-3">Set New Password</h2>
                         <p className="text-white/40 font-bold leading-relaxed px-4">
-                            No worries, it happens. Enter your email and we'll send you recovery instructions.
+                            Choose a password you'll remember. At least 6 characters.
                         </p>
                     </div>
 
-                    {!isSubmitted ? (
+                    {!done ? (
                         <motion.form
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -67,29 +76,42 @@ const ForgotPassword = () => {
                             className="space-y-6"
                         >
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-white/50 uppercase tracking-widest ml-1">Email Address</label>
+                                <label className="text-xs font-black text-white/50 uppercase tracking-widest ml-1">New password</label>
                                 <div className="relative group">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/50 group-focus-within:text-emerald-400 transition-colors" size={20} />
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/50 group-focus-within:text-emerald-400 transition-colors" size={20} />
                                     <input
-                                        type="email"
+                                        type="password"
                                         required
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="name@example.com"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="••••••••"
                                         className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all shadow-inner"
                                     />
                                 </div>
                             </div>
 
-                            {error && (
-                                <p className="text-red-400 text-sm font-bold text-center">{error}</p>
-                            )}
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-white/50 uppercase tracking-widest ml-1">Confirm password</label>
+                                <div className="relative group">
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/50 group-focus-within:text-emerald-400 transition-colors" size={20} />
+                                    <input
+                                        type="password"
+                                        required
+                                        value={confirm}
+                                        onChange={(e) => setConfirm(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all shadow-inner"
+                                    />
+                                </div>
+                            </div>
+
+                            {error && <p className="text-red-400 text-sm font-bold text-center">{error}</p>}
+
                             <button
                                 disabled={loading}
-                                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-emerald-900/40 active:scale-95 flex items-center justify-center gap-2 group"
+                                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-emerald-900/40 active:scale-95"
                             >
-                                {loading ? 'Generating...' : 'Send Instructions'}
-                                <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                {loading ? 'Resetting...' : 'Reset Password'}
                             </button>
                         </motion.form>
                     ) : (
@@ -99,25 +121,9 @@ const ForgotPassword = () => {
                             className="text-center py-6"
                         >
                             <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6 mb-6">
-                                <p className="text-emerald-400 font-bold text-lg mb-2">Reset link generated</p>
-                                <p className="text-white/50 text-sm font-bold">If <span className="text-white">{email}</span> matches an account, use the link below.</p>
+                                <p className="text-emerald-400 font-bold text-lg mb-2">Password reset</p>
+                                <p className="text-white/50 text-sm font-bold">Redirecting to login...</p>
                             </div>
-                            {resetUrl ? (
-                                <Link
-                                    to={resetUrl.replace(/^https?:\/\/[^/]+/, '')}
-                                    className="block w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-2xl font-black text-base transition-all shadow-xl shadow-emerald-900/40 mb-6"
-                                >
-                                    Reset password now
-                                </Link>
-                            ) : (
-                                <p className="text-white/40 text-xs font-bold mb-6">If your email is registered, the reset link has been generated.</p>
-                            )}
-                            <button
-                                onClick={() => { setIsSubmitted(false); setResetUrl(''); }}
-                                className="text-emerald-500 font-black text-sm uppercase tracking-widest hover:text-emerald-400 transition-colors"
-                            >
-                                Try a different email
-                            </button>
                         </motion.div>
                     )}
 
@@ -128,16 +134,9 @@ const ForgotPassword = () => {
                         </Link>
                     </div>
                 </div>
-
-                {/* Secure Footer */}
-                <div className="mt-8 text-center">
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
-                        Secure Recovery Portal • DoctorLink Systems
-                    </p>
-                </div>
             </motion.div>
         </div>
     );
 };
 
-export default ForgotPassword;
+export default ResetPassword;
