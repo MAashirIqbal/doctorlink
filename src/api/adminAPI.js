@@ -47,3 +47,6 @@ export const deleteAnnouncement = (id) => API.delete(`/admin/announcements/${id}
 // Announcements (public-facing)
 export const getActiveAnnouncements = () => API.get('/announcements/active');
 export const dismissAnnouncement = (id) => API.put(`/announcements/${id}/dismiss`);
+
+// Web scraping ingest
+export const scrapeDoctors = (data) => API.post('/admin/scrape-doctors', data);

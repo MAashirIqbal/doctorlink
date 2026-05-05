@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Emerald Wellness Palette - High Contrast */
   --color-primary-50: #f0fdf4;
@@ -49,7 +51,30 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #ffffff;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+.dark body {
+  background-color: #0a0f0d;
+  color: #e5e7eb;
+}
+
+/* Soft override for the most common surface backgrounds in dark mode.
+   Page-level shells already use these utility classes throughout the app. */
+.dark .bg-\[\#fafafa\] { background-color: #0a0f0d !important; }
+.dark .bg-white { background-color: #111817 !important; color: #e5e7eb; }
+.dark .bg-gray-50 { background-color: #161e1c !important; }
+.dark .bg-gray-50\/30 { background-color: #161e1c !important; }
+.dark .bg-gray-50\/50 { background-color: #161e1c !important; }
+.dark .border-gray-50 { border-color: #1c2624 !important; }
+.dark .border-gray-100 { border-color: #1c2624 !important; }
+.dark .border-gray-200 { border-color: #232e2c !important; }
+.dark .text-gray-900 { color: #e5e7eb !important; }
+.dark .text-gray-700 { color: #d1d5db !important; }
+.dark .text-gray-600 { color: #c2c8c4 !important; }
+.dark .text-gray-500 { color: #9ca3af !important; }
+.dark .text-gray-400 { color: #6b7280 !important; }
+.dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]) { border-color: #1c2624 !important; }
 
 @keyframes toast-bar {
   from { width: 100%; }

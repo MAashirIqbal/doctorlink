@@ -12,6 +12,36 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getDoctorDetail, approveDoctor, rejectDoctor, editDoctor, blockUser, unblockUser, resetUserPassword, createAnnouncement } from '../../api/adminAPI';
+import { resolveFileUrl } from '../../api/axios';
+
+const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const fileBase = apiBase.replace(/\/api\/?$/, '');
+const toFileUrl = (p) => (!p ? '' : (p.startsWith('http') ? p : `${fileBase}${p}`));
+const isImageDoc = (p) => /\.(png|jpe?g|webp|gif)$/i.test(p || '');
+
+const DocRow = ({ label, path }) => {
+    if (!path) {
+        return (
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                <FileText size={14} className="text-gray-400" />
+                <span className="text-xs font-black text-gray-700 truncate flex-1">{label}</span>
+                <span className="text-[10px] font-black text-red-500">Missing</span>
+            </div>
+        );
+    }
+    const url = toFileUrl(path);
+    return (
+        <a href={url} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary-200 transition-all">
+            {isImageDoc(path) ? (
+                <img src={url} alt={label} className="w-10 h-10 rounded-md object-cover border border-gray-200" />
+            ) : (
+                <FileText size={14} className="text-primary-700" />
+            )}
+            <span className="text-xs font-black text-gray-700 truncate flex-1">{label}</span>
+            <Eye size={12} className="text-gray-400" />
+        </a>
+    );
+};
 
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
@@ -179,7 +209,7 @@ const AdminDoctorDetail = () => {
                                     className="bg-white rounded-3xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-6">
                                     <div className="flex items-start gap-5">
                                         {doctor.avatar ? (
-                                            <img src={doctor.avatar} alt={doctor.fullName} className="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md" />
+                                            <img src={resolveFileUrl(doctor.avatar)} alt={doctor.fullName} className="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md" />
                                         ) : (
                                             <div className="w-20 h-20 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-2xl border-2 border-white shadow-md">{doctor.fullName?.[0] || 'D'}</div>
                                         )}
@@ -408,17 +438,14 @@ const AdminDoctorDetail = () => {
                                 </motion.div>
 
                                 {/* Documents */}
-                                {doctor.documents?.length > 0 && (
+                                {doctor.documents && (
                                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                                         className="bg-white rounded-3xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-6">
-                                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Documents</h3>
+                                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Verification Documents</h3>
                                         <div className="space-y-2">
-                                            {doctor.documents.map((doc, i) => (
-                                                <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                                    <FileText size={14} className="text-primary-700" />
-                                                    <span className="text-xs font-black text-gray-700 truncate flex-1">{doc}</span>
-                                                </div>
-                                            ))}
+                                            <DocRow label="PMC / PMDC License" path={doctor.documents.pmcLicense} />
+                                            <DocRow label="Degree Certificate" path={doctor.documents.degreeCertificate} />
+                                            <DocRow label="CNIC Copy" path={doctor.documents.cnicCopy} />
                                         </div>
                                     </motion.div>
                                 )}

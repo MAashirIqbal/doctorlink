@@ -12,6 +12,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { overrideAppointmentStatus } from '../../api/adminAPI';
 import { getAppointmentDetail } from '../../api/appointmentAPI';
+import { resolveFileUrl } from '../../api/axios';
 
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
@@ -166,7 +167,7 @@ const AdminAppointmentDetail = () => {
                                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Doctor</p>
                                         <div className="flex items-center gap-3 mb-3">
                                             {apt.doctor?.avatar ? (
-                                                <img src={apt.doctor.avatar} alt={apt.doctor.fullName} className="w-12 h-12 rounded-xl object-cover border border-white shadow-sm" />
+                                                <img src={resolveFileUrl(apt.doctor.avatar)} alt={apt.doctor.fullName} className="w-12 h-12 rounded-xl object-cover border border-white shadow-sm" />
                                             ) : (
                                                 <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-lg">{apt.doctor?.fullName?.[0] || 'D'}</div>
                                             )}

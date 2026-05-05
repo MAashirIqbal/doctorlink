@@ -5,17 +5,21 @@ import {
     Calendar, Clock, MapPin, Star, User, Activity, LogOut,
     ArrowLeft, CheckCircle2, XCircle, AlertCircle, CreditCard,
     Download, Printer, FileText, Phone, Mail, Search,
-    ShieldCheck, Receipt, Hash, Building2
+    ShieldCheck, Receipt, Hash, Building2, MessageCircle, Sparkles
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getAppointmentDetail, cancelAppointment, rescheduleAppointment } from '../../api/appointmentAPI';
 import { createCheckout } from '../../api/paymentAPI';
 import { getDoctorSlots } from '../../api/doctorAPI';
+import ClinicMap from '../../components/ClinicMap';
+import { resolveFileUrl } from '../../api/axios';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/patient/dashboard' },
     { icon: Calendar, label: 'My Appointments', path: '/patient/appointments' },
+    { icon: Sparkles, label: 'Symptom Analyzer', path: '/patient/symptom-analyzer' },
+    { icon: MessageCircle, label: 'Messages', path: '/messages' },
     { icon: Search, label: 'Find Doctors', path: '/doctors' },
     { icon: User, label: 'My Profile', path: '/patient/profile' },
 ];
@@ -241,7 +245,7 @@ const AppointmentDetail = () => {
                 <div className="p-4 border-t border-gray-50">
                     <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                            <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
                         ) : (
                             <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">
                                 {user?.name?.[0] || 'P'}
@@ -319,6 +323,43 @@ const AppointmentDetail = () => {
                         </div>
                     </motion.div>
 
+                    {/* Prescription (only after completion) */}
+                    {appointment.status === 'completed' && appointment.prescription?.url && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                            className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 mb-8 flex items-start gap-4">
+                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-emerald-100">
+                                <FileText size={20} className="text-emerald-700" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-sm font-black text-emerald-900">Prescription available</p>
+                                <p className="text-xs font-bold text-emerald-700 mt-0.5">
+                                    Uploaded {new Date(appointment.prescription.uploadedAt).toLocaleString()}
+                                </p>
+                                {appointment.prescription.notes && (
+                                    <p className="text-xs font-bold text-emerald-800 mt-2 bg-white/60 rounded-lg p-2 border border-emerald-100">
+                                        {appointment.prescription.notes}
+                                    </p>
+                                )}
+                            </div>
+                            <a href={`${import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:5000'}${appointment.prescription.url}`}
+                                target="_blank" rel="noreferrer"
+                                className="self-center flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all">
+                                <Download size={14} />
+                                Open
+                            </a>
+                        </motion.div>
+                    )}
+
+                    {/* Referred-from notice */}
+                    {appointment.referredFrom?.appointment && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-8 flex items-start gap-3">
+                            <FileText size={18} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-xs font-bold text-blue-800 leading-relaxed">
+                                This appointment was created via a referral{appointment.referredFrom.reason ? `: ${appointment.referredFrom.reason}` : '.'}
+                            </p>
+                        </div>
+                    )}
+
                     <div className="grid lg:grid-cols-3 gap-8">
                         {/* Left Column — Doctor & Appointment Info */}
                         <div className="lg:col-span-2 space-y-6">
@@ -332,7 +373,7 @@ const AppointmentDetail = () => {
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Doctor Information</p>
                                 <div className="flex items-center gap-5">
                                     {doc?.avatar ? (
-                                        <img src={doc.avatar} alt={doc.fullName} className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg" />
+                                        <img src={resolveFileUrl(doc.avatar)} alt={doc.fullName} className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg" />
                                     ) : (
                                         <div className="w-20 h-20 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-2xl border-4 border-white shadow-lg">
                                             {doc?.fullName?.[0]}
@@ -363,6 +404,12 @@ const AppointmentDetail = () => {
                                         View Profile
                                     </Link>
                                 </div>
+                                {/* Clinic map + ETA (only shown after the appointment is confirmed) */}
+                                {appointment.status === 'confirmed' && (
+                                    <div className="mt-5">
+                                        <ClinicMap doctor={doc} />
+                                    </div>
+                                )}
                             </motion.div>
 
                             {/* Appointment Details Grid */}
@@ -501,7 +548,7 @@ const AppointmentDetail = () => {
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-3">
                                         {user?.avatar ? (
-                                            <img src={user.avatar} alt={user?.name} className="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-sm" />
+                                            <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-sm" />
                                         ) : (
                                             <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-lg border-2 border-white shadow-sm">
                                                 {patient?.name?.[0] || 'P'}

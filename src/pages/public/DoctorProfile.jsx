@@ -10,6 +10,8 @@ import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import { getDoctor, getDoctorSlots } from '../../api/doctorAPI';
 import { getDoctorReviews } from '../../api/reviewAPI';
+import ClinicMap from '../../components/ClinicMap';
+import { resolveFileUrl } from '../../api/axios';
 
 const parseSlotHour = (slot) => {
     const match = slot.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
@@ -146,7 +148,7 @@ const DoctorProfile = () => {
                             className="relative"
                         >
                             <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-3xl overflow-hidden border-4 border-white shadow-2xl shadow-gray-200/50">
-                                <img src={doctor.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.fullName)}&size=400&background=0a5c36&color=fff&bold=true`} alt={doctor.fullName} className="w-full h-full object-cover" />
+                                <img src={resolveFileUrl(doctor.avatar) || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.fullName)}&size=400&background=0a5c36&color=fff&bold=true`} alt={doctor.fullName} className="w-full h-full object-cover" />
                             </div>
                             {doctor.pmcNumber && (
                                 <div className="absolute -bottom-3 -right-3 bg-emerald-500 text-white p-2.5 rounded-2xl shadow-lg shadow-emerald-500/30">
@@ -250,6 +252,15 @@ const DoctorProfile = () => {
                                         </div>
                                     </div>
                                 </div>
+                            </motion.div>
+
+                            {/* Clinic location */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.25 }}
+                            >
+                                <ClinicMap doctor={doctor} />
                             </motion.div>
 
                             {/* Reviews */}
@@ -356,6 +367,14 @@ const DoctorProfile = () => {
                                         className="block w-full py-4 rounded-2xl font-black text-base text-center bg-primary-700 hover:bg-primary-800 text-white shadow-xl shadow-primary-700/20 active:scale-95 transition-all"
                                     >
                                         Book Appointment
+                                    </Link>
+
+                                    {/* Message Button */}
+                                    <Link
+                                        to={`/messages?with=${doctor._id}`}
+                                        className="block w-full py-3 rounded-2xl font-black text-sm text-center bg-white border border-primary-200 text-primary-700 hover:bg-primary-50 active:scale-95 transition-all mt-3"
+                                    >
+                                        Send Message
                                     </Link>
 
                                     {/* Trust Indicators */}

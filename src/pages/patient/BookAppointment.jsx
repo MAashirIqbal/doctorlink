@@ -9,6 +9,7 @@ import { getDoctor, getDoctorSlots } from '../../api/doctorAPI';
 import { createAppointment } from '../../api/appointmentAPI';
 import { createCheckout } from '../../api/paymentAPI';
 import { useAuth } from '../../context/AuthContext';
+import { resolveFileUrl } from '../../api/axios';
 
 const parseSlotMinutes = (slot) => {
     const match = slot.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
@@ -297,7 +298,7 @@ const BookAppointment = () => {
                                 <div className="p-8">
                                     <div className="flex items-center gap-5 mb-8 pb-8 border-b border-gray-100">
                                         {doctor.avatar ? (
-                                            <img src={doctor.avatar} alt={doctor.fullName} className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg" />
+                                            <img src={resolveFileUrl(doctor.avatar)} alt={doctor.fullName} className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg" />
                                         ) : (
                                             <div className="w-20 h-20 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-2xl border-4 border-white shadow-lg">{doctor.fullName?.[0]}</div>
                                         )}

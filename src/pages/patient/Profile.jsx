@@ -4,15 +4,18 @@ import { motion } from 'framer-motion';
 import {
     User, Mail, Phone, MapPin, Calendar, Camera, Save,
     Activity, Search, Settings, LogOut, CheckCircle2,
-    Lock, Eye, EyeOff, Shield
+    Lock, Eye, EyeOff, Shield, MessageCircle, Sparkles
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { updateProfile, changePassword } from '../../api/authAPI';
+import { resolveFileUrl } from '../../api/axios';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/patient/dashboard' },
     { icon: Calendar, label: 'My Appointments', path: '/patient/appointments' },
+    { icon: Sparkles, label: 'Symptom Analyzer', path: '/patient/symptom-analyzer' },
+    { icon: MessageCircle, label: 'Messages', path: '/messages' },
     { icon: Search, label: 'Find Doctors', path: '/doctors' },
     { icon: User, label: 'My Profile', path: '/patient/profile', active: true },
 ];
@@ -121,7 +124,7 @@ const PatientProfile = () => {
                 <div className="p-4 border-t border-gray-50">
                     <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                            <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
                         ) : (
                             <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
                         )}

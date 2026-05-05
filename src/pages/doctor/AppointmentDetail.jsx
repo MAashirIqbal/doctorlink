@@ -5,16 +5,19 @@ import {
     Calendar, Clock, User, Activity, LogOut, ArrowLeft,
     Users, Wallet, ClipboardList, Stethoscope, CheckCircle2,
     XCircle, AlertCircle, Phone, Mail, MapPin, CreditCard,
-    FileText, DollarSign
+    FileText, DollarSign, Upload, Send, X, Search, MessageCircle
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getAppointmentDetail, acceptAppointment, rejectAppointment, completeAppointment, markNoShow, acceptReschedule, rejectReschedule } from '../../api/appointmentAPI';
+import { getAppointmentDetail, acceptAppointment, rejectAppointment, completeAppointment, markNoShow, acceptReschedule, rejectReschedule, uploadPrescription, referAppointment } from '../../api/appointmentAPI';
+import { getDoctors } from '../../api/doctorAPI';
+import { FILE_BASE, resolveFileUrl } from '../../api/axios';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard' },
     { icon: Calendar, label: 'Appointments', path: '/doctor/appointments', active: true },
     { icon: Users, label: 'My Patients', path: '/doctor/patients' },
+    { icon: MessageCircle, label: 'Messages', path: '/messages' },
     { icon: Wallet, label: 'Earnings', path: '/doctor/earnings' },
     { icon: ClipboardList, label: 'Schedule', path: '/doctor/schedule' },
     { icon: User, label: 'Profile', path: '/doctor/profile' },
@@ -117,7 +120,79 @@ const DoctorAppointmentDetail = () => {
         setActionLoading(false);
     };
 
+    // ===== Prescription =====
+    const [rxFile, setRxFile] = useState(null);
+    const [rxNotes, setRxNotes] = useState('');
+    const [rxLoading, setRxLoading] = useState(false);
+
+    const handleUploadRx = async (e) => {
+        e.preventDefault();
+        if (!rxFile) return toast.error('Please pick a file');
+        setRxLoading(true);
+        try {
+            const fd = new FormData();
+            fd.append('prescription', rxFile);
+            if (rxNotes) fd.append('notes', rxNotes);
+            await uploadPrescription(id, fd);
+            toast.success('Prescription uploaded');
+            setRxFile(null);
+            setRxNotes('');
+            await fetchDetail();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Upload failed');
+        }
+        setRxLoading(false);
+    };
+
+    // ===== Referral =====
+    const [showReferral, setShowReferral] = useState(false);
+    const [referralSearch, setReferralSearch] = useState('');
+    const [referralOptions, setReferralOptions] = useState([]);
+    const [referralTo, setReferralTo] = useState(null);
+    const [referralDate, setReferralDate] = useState('');
+    const [referralTime, setReferralTime] = useState('');
+    const [referralReason, setReferralReason] = useState('');
+    const [referralLoading, setReferralLoading] = useState(false);
+
+    const openReferral = async () => {
+        setShowReferral(true);
+        try {
+            const { data } = await getDoctors({ limit: 30 });
+            setReferralOptions(data.doctors || []);
+        } catch { /* empty */ }
+    };
+
+    const handleSubmitReferral = async (e) => {
+        e.preventDefault();
+        if (!referralTo || !referralDate || !referralTime) {
+            return toast.error('Pick a doctor, date, and time slot');
+        }
+        setReferralLoading(true);
+        try {
+            await referAppointment(id, {
+                toDoctorId: referralTo._id,
+                date: referralDate,
+                timeSlot: referralTime,
+                reason: referralReason,
+            });
+            toast.success('Referral sent');
+            setShowReferral(false);
+            setReferralTo(null);
+            setReferralDate('');
+            setReferralTime('');
+            setReferralReason('');
+            await fetchDetail();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Referral failed');
+        }
+        setReferralLoading(false);
+    };
+
     const config = statusConfig[appointment?.status] || statusConfig.pending;
+    const filteredReferralOptions = referralOptions.filter((d) => {
+        const q = referralSearch.toLowerCase();
+        return !q || d.fullName?.toLowerCase().includes(q) || d.specialization?.toLowerCase().includes(q);
+    });
 
     return (
         <div className="min-h-screen bg-[#fafafa] flex">
@@ -152,7 +227,7 @@ const DoctorAppointmentDetail = () => {
                 <div className="p-4 border-t border-gray-50">
                     <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                            <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
                         ) : (
                             <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
                         )}
@@ -221,6 +296,9 @@ const DoctorAppointmentDetail = () => {
                                                 <button onClick={handleComplete} disabled={actionLoading} className="px-4 py-2 bg-primary-700 text-white rounded-xl text-xs font-black hover:bg-primary-800 transition-all disabled:opacity-50">
                                                     Mark Complete
                                                 </button>
+                                                <button onClick={openReferral} disabled={actionLoading} className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-black hover:bg-blue-700 transition-all disabled:opacity-50">
+                                                    Refer
+                                                </button>
                                                 {new Date(appointment.date) < new Date() && (
                                                     <button onClick={handleNoShow} disabled={actionLoading} className="px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-black hover:bg-orange-600 transition-all disabled:opacity-50">
                                                         Mark No-Show
@@ -278,6 +356,46 @@ const DoctorAppointmentDetail = () => {
                                     </motion.div>
                                 )}
 
+                                {/* Prescription (visible only when completed) */}
+                                {appointment.status === 'completed' && (
+                                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.035 }}
+                                        className="bg-white rounded-2xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-6">
+                                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Prescription</h3>
+                                        {appointment.prescription?.url ? (
+                                            <div className="space-y-3">
+                                                <a href={`${FILE_BASE}${appointment.prescription.url}`} target="_blank" rel="noreferrer"
+                                                    className="flex items-center gap-3 p-3.5 bg-emerald-50 rounded-xl border border-emerald-100 hover:border-emerald-200 transition-all">
+                                                    <FileText size={18} className="text-emerald-700" />
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-black text-emerald-800">Uploaded prescription</p>
+                                                        <p className="text-[10px] font-bold text-emerald-600">{new Date(appointment.prescription.uploadedAt).toLocaleString()}</p>
+                                                    </div>
+                                                    <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">View</span>
+                                                </a>
+                                                {appointment.prescription.notes && (
+                                                    <p className="text-xs font-bold text-gray-600 bg-gray-50 rounded-xl p-3 border border-gray-100">{appointment.prescription.notes}</p>
+                                                )}
+                                                <p className="text-[10px] font-bold text-gray-400">Re-upload below to replace</p>
+                                            </div>
+                                        ) : null}
+
+                                        <form onSubmit={handleUploadRx} className="space-y-3 mt-3">
+                                            <label className="flex items-center gap-3 p-3.5 bg-gray-50 border border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-primary-200">
+                                                <Upload size={16} className="text-gray-400" />
+                                                <span className="text-xs font-bold text-gray-500 truncate">{rxFile ? rxFile.name : 'Click to attach prescription (PDF / JPG / PNG, max 5 MB)'}</span>
+                                                <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => setRxFile(e.target.files?.[0] || null)} />
+                                            </label>
+                                            <textarea value={rxNotes} onChange={(e) => setRxNotes(e.target.value)} rows={2} maxLength={500}
+                                                placeholder="Notes for the patient (optional)"
+                                                className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-xs font-bold text-gray-900 focus:outline-none focus:border-primary-200" />
+                                            <button type="submit" disabled={!rxFile || rxLoading}
+                                                className="w-full bg-primary-700 hover:bg-primary-600 text-white py-3 rounded-xl text-xs font-black transition-all disabled:opacity-50">
+                                                {rxLoading ? 'Uploading...' : (appointment.prescription?.url ? 'Replace prescription' : 'Upload prescription')}
+                                            </button>
+                                        </form>
+                                    </motion.div>
+                                )}
+
                                 {/* Reschedule History */}
                                 {appointment.rescheduleHistory?.length > 0 && (
                                     <motion.div
@@ -311,10 +429,19 @@ const DoctorAppointmentDetail = () => {
                                     transition={{ delay: 0.05 }}
                                     className="bg-white rounded-2xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-6"
                                 >
-                                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Patient Information</h3>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Patient Information</h3>
+                                        {appointment.patient?._id && (
+                                            <Link to={`/messages?with=${appointment.patient._id}`}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 hover:bg-primary-100 text-primary-700 border border-primary-100 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                                                <Send size={11} />
+                                                Message
+                                            </Link>
+                                        )}
+                                    </div>
                                     <div className="flex items-start gap-4">
                                         {appointment.patient?.avatar ? (
-                                            <img src={appointment.patient.avatar} alt={appointment.patient.name} className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-md" />
+                                            <img src={resolveFileUrl(appointment.patient.avatar)} alt={appointment.patient.name} className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-md" />
                                         ) : (
                                             <div className="w-16 h-16 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-xl border-2 border-white shadow-md">
                                                 {appointment.patient?.name?.[0] || 'P'}
@@ -477,6 +604,84 @@ const DoctorAppointmentDetail = () => {
                     )}
                 </div>
             </main>
+
+            {/* Referral Modal */}
+            {showReferral && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowReferral(false)}>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl border border-gray-200/60 max-h-[90vh] overflow-y-auto"
+                    >
+                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                            <div>
+                                <h3 className="text-lg font-black text-gray-900 font-display">Refer to Another Doctor</h3>
+                                <p className="text-xs font-bold text-gray-400">Pick a specialist, propose a slot, and add a reason.</p>
+                            </div>
+                            <button onClick={() => setShowReferral(false)} className="p-2 bg-gray-50 rounded-xl text-gray-400 hover:bg-gray-100">
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSubmitReferral} className="p-6 space-y-5">
+                            <div>
+                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 block">Search doctor</label>
+                                <div className="relative">
+                                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <input value={referralSearch} onChange={(e) => setReferralSearch(e.target.value)}
+                                        placeholder="Name or specialization"
+                                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-9 pr-3 py-3 text-sm font-bold focus:outline-none focus:border-primary-200" />
+                                </div>
+                                <div className="mt-3 max-h-52 overflow-y-auto space-y-1.5 pr-1">
+                                    {filteredReferralOptions.slice(0, 12).map((d) => (
+                                        <button key={d._id} type="button" onClick={() => setReferralTo(d)}
+                                            className={`w-full text-left flex items-center gap-3 p-2.5 rounded-xl border transition-all ${referralTo?._id === d._id ? 'bg-primary-50 border-primary-200' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}>
+                                            <div className="w-9 h-9 rounded-lg bg-primary-100 flex items-center justify-center text-primary-700 text-xs font-black">{d.fullName?.[0]}</div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-black text-gray-900 truncate">{d.fullName}</p>
+                                                <p className="text-[10px] font-bold text-primary-700 truncate">{d.specialization}</p>
+                                            </div>
+                                            {referralTo?._id === d._id && <CheckCircle2 size={14} className="text-primary-700" />}
+                                        </button>
+                                    ))}
+                                    {filteredReferralOptions.length === 0 && (
+                                        <p className="text-center text-xs font-bold text-gray-400 py-4">No matching doctors</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 block">Date</label>
+                                    <input type="date" value={referralDate} onChange={(e) => setReferralDate(e.target.value)} required
+                                        min={new Date().toISOString().slice(0, 10)}
+                                        className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-3 text-sm font-bold focus:outline-none focus:border-primary-200" />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 block">Time slot</label>
+                                    <input type="text" value={referralTime} onChange={(e) => setReferralTime(e.target.value)}
+                                        placeholder="e.g. 10:00 AM" required
+                                        className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-3 text-sm font-bold focus:outline-none focus:border-primary-200" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 block">Reason (optional)</label>
+                                <textarea value={referralReason} onChange={(e) => setReferralReason(e.target.value)} rows={3} maxLength={300}
+                                    placeholder="Why are you referring this patient?"
+                                    className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-sm font-bold focus:outline-none focus:border-primary-200" />
+                            </div>
+
+                            <button type="submit" disabled={referralLoading || !referralTo}
+                                className="w-full bg-primary-700 hover:bg-primary-600 text-white py-3.5 rounded-xl font-black text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                                <Send size={16} />
+                                {referralLoading ? 'Sending...' : 'Send Referral'}
+                            </button>
+                        </form>
+                    </motion.div>
+                </div>
+            )}
         </div>
     );
 };

@@ -7,7 +7,12 @@ export const getDoctorSlots = (id, params) => API.get(`/doctors/${id}/slots`, { 
 export const getDoctorReviews = (doctorId) => API.get(`/reviews/doctor/${doctorId}`);
 
 // Doctor Apply
-export const applyDoctor = (data) => API.post('/doctors/apply', data);
+export const applyDoctor = (data) => {
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    return API.post('/doctors/apply', data, isFormData
+        ? { headers: { 'Content-Type': 'multipart/form-data' } }
+        : undefined);
+};
 export const doctorLogin = (data) => API.post('/doctors/login', data);
 
 // Authenticated doctor
@@ -17,3 +22,4 @@ export const updateMySchedule = (data) => API.put('/doctors/me/schedule', data);
 export const getDoctorDashboard = () => API.get('/doctors/me/dashboard');
 export const getMyPatients = () => API.get('/doctors/me/patients');
 export const getMyEarnings = () => API.get('/doctors/me/earnings');
+export const geocodeMyLocation = () => API.post('/doctors/me/geocode');

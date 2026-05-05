@@ -11,6 +11,7 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getUserDetail, blockUser, unblockUser, resetUserPassword, createAnnouncement } from '../../api/adminAPI';
+import { resolveFileUrl } from '../../api/axios';
 
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
@@ -153,7 +154,7 @@ const AdminPatientDetail = () => {
                                     className="bg-white rounded-3xl border border-gray-200/60 shadow-sm shadow-gray-200/50 p-6">
                                     <div className="flex items-start gap-5">
                                         {patient.avatar ? (
-                                            <img src={patient.avatar} alt={patient.name} className="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md" />
+                                            <img src={resolveFileUrl(patient.avatar)} alt={patient.name} className="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md" />
                                         ) : (
                                             <div className="w-20 h-20 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-black text-2xl border-2 border-white shadow-md">{patient.name?.[0] || 'P'}</div>
                                         )}

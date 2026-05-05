@@ -17,3 +17,12 @@ export const markNoShow = (id) => API.put(`/appointments/${id}/no-show`);
 export const acceptReschedule = (id) => API.put(`/appointments/${id}/reschedule/accept`);
 export const rejectReschedule = (id) => API.put(`/appointments/${id}/reschedule/reject`);
 export const getDoctorNoShows = () => API.get('/appointments/doctor/no-shows');
+
+// Prescription (doctor)
+export const uploadPrescription = (id, formData) =>
+    API.post(`/appointments/${id}/prescription`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+// Referral (doctor)
+export const referAppointment = (id, data) => API.post(`/appointments/${id}/refer`, data);

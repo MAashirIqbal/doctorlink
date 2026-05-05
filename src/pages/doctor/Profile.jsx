@@ -2,19 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext';
 import { motion } from 'framer-motion';
 import {
-    User, Mail, Phone, MapPin, Briefcase, CreditCard, Clock,
+    User, Mail, Phone, MapPin, Briefcase, CreditCard, Clock, Navigation,
     Camera, Save, Activity, Calendar, Users, Wallet,
     LogOut, Stethoscope, ClipboardList, Plus, X, CheckCircle2,
-    GraduationCap, Languages, Award, Globe
+    GraduationCap, Languages, Award, Globe, MessageCircle
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getMyDoctorProfile, updateMyDoctorProfile } from '../../api/doctorAPI';
+import { getMyDoctorProfile, updateMyDoctorProfile, geocodeMyLocation } from '../../api/doctorAPI';
+import { resolveFileUrl } from '../../api/axios';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard' },
     { icon: Calendar, label: 'Appointments', path: '/doctor/appointments' },
     { icon: Users, label: 'My Patients', path: '/doctor/patients' },
+    { icon: MessageCircle, label: 'Messages', path: '/messages' },
     { icon: Wallet, label: 'Earnings', path: '/doctor/earnings' },
     { icon: ClipboardList, label: 'Schedule', path: '/doctor/schedule' },
     { icon: User, label: 'Profile', path: '/doctor/profile', active: true },
@@ -87,6 +89,19 @@ const DoctorProfile = () => {
         }
     };
 
+    const [geocoding, setGeocoding] = useState(false);
+    const handleGeocode = async () => {
+        if (!profile.location) return toast.error('Set your clinic location first');
+        setGeocoding(true);
+        try {
+            const { data } = await geocodeMyLocation();
+            toast.success(`Location mapped: ${data.latitude.toFixed(3)}, ${data.longitude.toFixed(3)}`);
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Could not geocode that location');
+        }
+        setGeocoding(false);
+    };
+
     const handleSave = async () => {
         try {
             await updateMyDoctorProfile({
@@ -152,7 +167,7 @@ const DoctorProfile = () => {
                 <div className="p-4 border-t border-gray-50">
                     <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                            <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
                         ) : (
                             <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
                         )}
@@ -264,6 +279,15 @@ const DoctorProfile = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+
+                            <div className="mt-4">
+                                <button type="button" onClick={handleGeocode} disabled={geocoding}
+                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-black transition-all disabled:opacity-50">
+                                    <Navigation size={13} />
+                                    {geocoding ? 'Locating clinic...' : 'Map clinic on OpenStreetMap'}
+                                </button>
+                                <p className="text-[10px] font-bold text-gray-400 mt-1.5">Patients will see directions and ETA from their location.</p>
                             </div>
 
                             <div className="mt-6 space-y-2">

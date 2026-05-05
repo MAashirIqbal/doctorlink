@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Activity, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { resolveFileUrl } from '../../api/axios';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -104,7 +105,7 @@ const Navbar = () => {
                                     className="flex items-center gap-2.5 bg-primary-50 hover:bg-primary-100 border border-primary-100 px-4 py-2 rounded-2xl transition-all"
                                 >
                                     {user?.avatar ? (
-                                        <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-xl object-cover" />
+                                        <img src={resolveFileUrl(user.avatar)} alt={user.name} className="w-8 h-8 rounded-xl object-cover" />
                                     ) : (
                                         <div className="w-8 h-8 bg-primary-700 rounded-xl flex items-center justify-center text-white text-xs font-black">
                                             {initials}

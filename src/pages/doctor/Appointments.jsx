@@ -4,16 +4,18 @@ import { motion } from 'framer-motion';
 import {
     Calendar, Clock, User, Search, Activity, LogOut,
     Users, Wallet, ClipboardList, Stethoscope, CheckCircle2,
-    XCircle, AlertCircle, Eye, ChevronRight, Filter, MapPin
+    XCircle, AlertCircle, Eye, ChevronRight, Filter, MapPin, MessageCircle
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getDoctorAppointments, acceptAppointment, rejectAppointment, completeAppointment, markNoShow, acceptReschedule, rejectReschedule } from '../../api/appointmentAPI';
+import { resolveFileUrl } from '../../api/axios';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard' },
     { icon: Calendar, label: 'Appointments', path: '/doctor/appointments', active: true },
     { icon: Users, label: 'My Patients', path: '/doctor/patients' },
+    { icon: MessageCircle, label: 'Messages', path: '/messages' },
     { icon: Wallet, label: 'Earnings', path: '/doctor/earnings' },
     { icon: ClipboardList, label: 'Schedule', path: '/doctor/schedule' },
     { icon: User, label: 'Profile', path: '/doctor/profile' },
@@ -105,7 +107,7 @@ const DoctorAppointments = () => {
                 <div className="p-4 border-t border-gray-50">
                     <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                            <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
                         ) : (
                             <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
                         )}
@@ -189,7 +191,7 @@ const DoctorAppointments = () => {
                                 >
                                     <div className="flex flex-col sm:flex-row items-start gap-5">
                                         {apt.patient?.avatar ? (
-                                            <img src={apt.patient.avatar} alt={apt.patient?.name} className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-md" />
+                                            <img src={resolveFileUrl(apt.patient.avatar)} alt={apt.patient?.name} className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-md" />
                                         ) : (
                                             <div className="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-lg border-2 border-white shadow-md">{apt.patient?.name?.[0] || 'P'}</div>
                                         )}

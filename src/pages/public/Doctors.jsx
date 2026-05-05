@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import { getDoctors } from '../../api/doctorAPI';
+import { resolveFileUrl } from '../../api/axios';
 
 const specializations = [
     "All Specializations", "Cardiologist", "Dermatologist", "Pediatrician",
@@ -24,7 +25,7 @@ const DoctorCard = ({ doctor, index }) => (
                 {/* Image Section */}
                 <div className="relative h-56 overflow-hidden bg-primary-50">
                     <img
-                        src={doctor.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.fullName)}&size=300&background=0a5c36&color=fff&bold=true`}
+                        src={resolveFileUrl(doctor.avatar) || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.fullName)}&size=300&background=0a5c36&color=fff&bold=true`}
                         alt={doctor.fullName}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />

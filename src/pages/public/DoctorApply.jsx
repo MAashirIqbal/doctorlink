@@ -93,11 +93,15 @@ const CustomDropdown = ({ options, selected, onSelect, placeholder }) => {
     );
 };
 
-const DocumentUpload = ({ label, description }) => {
-    const [file, setFile] = useState(null);
+const DocumentUpload = ({ label, description, file, onChange, accept = 'image/*,application/pdf' }) => {
     return (
         <div className="relative group p-4 bg-white/5 border border-dashed border-white/10 rounded-2xl hover:border-emerald-500/30 transition-all cursor-pointer">
-            <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={(e) => setFile(e.target.files[0])} />
+            <input
+                type="file"
+                accept={accept}
+                className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                onChange={(e) => onChange(e.target.files[0] || null)}
+            />
             <div className="flex items-center gap-4">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${file ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-white/20 group-hover:text-emerald-500/50'}`}>
                     {file ? <CheckCircle2 size={24} /> : <Upload size={24} />}
@@ -131,8 +135,10 @@ const DoctorApply = () => {
         fullName: '', cnic: '', pmcNumber: '', email: '', password: '',
         experience: '', fee: '', location: '', degree: '',
     });
+    const [docs, setDocs] = useState({ pmcLicense: null, degreeCertificate: null, cnicCopy: null });
 
     const handleApplyChange = (field, value) => setApplyData(prev => ({ ...prev, [field]: value }));
+    const handleDocChange = (field, file) => setDocs(prev => ({ ...prev, [field]: file }));
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -150,14 +156,26 @@ const DoctorApply = () => {
     };
 
     const handleSubmitApplication = async () => {
-        setLoading(true); setError('');
+        setError('');
+        if (!docs.pmcLicense || !docs.degreeCertificate || !docs.cnicCopy) {
+            setError('Please upload all 3 documents');
+            return;
+        }
+
+        setLoading(true);
         try {
-            await applyDoctor({
+            const fd = new FormData();
+            Object.entries({
                 ...applyData,
                 specialization,
                 experience: Number(applyData.experience),
                 fee: Number(applyData.fee),
-            });
+            }).forEach(([k, v]) => fd.append(k, v));
+            fd.append('pmcLicense', docs.pmcLicense);
+            fd.append('degreeCertificate', docs.degreeCertificate);
+            fd.append('cnicCopy', docs.cnicCopy);
+
+            await applyDoctor(fd);
             setStep(4); // success state
         } catch (err) {
             setError(err.response?.data?.message || 'Application failed');
@@ -340,9 +358,27 @@ const DoctorApply = () => {
                                         </div>
 
                                         <div className="space-y-3">
-                                            <DocumentUpload label="PMC License (Front)" description="Valid PMC/PMDC Card Image" />
-                                            <DocumentUpload label="Degree Certificate" description="MBBS or Specialty Degree" />
-                                            <DocumentUpload label="CNIC Copy" description="Front & Back (National ID)" />
+                                            <DocumentUpload
+                                                label="PMC License (Front)"
+                                                description="Valid PMC/PMDC Card (image or PDF)"
+                                                file={docs.pmcLicense}
+                                                onChange={(f) => handleDocChange('pmcLicense', f)}
+                                            />
+                                            <DocumentUpload
+                                                label="Degree Certificate"
+                                                description="MBBS or Specialty Degree"
+                                                file={docs.degreeCertificate}
+                                                onChange={(f) => handleDocChange('degreeCertificate', f)}
+                                            />
+                                            <DocumentUpload
+                                                label="CNIC Copy"
+                                                description="Front & Back (National ID)"
+                                                file={docs.cnicCopy}
+                                                onChange={(f) => handleDocChange('cnicCopy', f)}
+                                            />
+                                            {error && !isLogin && (
+                                                <p className="text-red-400 text-xs font-bold bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">{error}</p>
+                                            )}
                                         </div>
 
                                         <div className="flex gap-4">

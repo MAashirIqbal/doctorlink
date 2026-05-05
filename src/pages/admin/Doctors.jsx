@@ -4,11 +4,13 @@ import {
     Activity, Users, Calendar, Search, Settings, LogOut, Shield,
     CheckCircle2, XCircle, Eye, UserCheck, Stethoscope, BarChart3,
     CreditCard, LayoutDashboard, AlertCircle, Mail, MapPin,
-    Megaphone, Heart, Star, Briefcase
+    Megaphone, Heart, Star, Briefcase, Database, Sparkles
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getAllDoctors } from '../../api/adminAPI';
+import { useToast } from '../../context/ToastContext';
+import { getAllDoctors, scrapeDoctors } from '../../api/adminAPI';
+import { resolveFileUrl } from '../../api/axios';
 
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
@@ -32,10 +34,28 @@ const statusConfig = {
 const AdminDoctors = () => {
     const { user: authUser, logout } = useAuth();
     const navigate = useNavigate();
+    const toast = useToast();
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [doctors, setDoctors] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [scraping, setScraping] = useState(false);
+    const [scrapeUrl, setScrapeUrl] = useState('');
+    const [showScraper, setShowScraper] = useState(false);
+
+    const handleScrape = async () => {
+        setScraping(true);
+        try {
+            const { data } = await scrapeDoctors({ url: scrapeUrl || undefined, autoApprove: false });
+            toast.success(`Ingested ${data.inserted} new, skipped ${data.skipped} duplicates${data.fetchError ? ' (used built-in sample)' : ''}`);
+            setShowScraper(false);
+            setScrapeUrl('');
+            await fetchDoctors();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Scrape failed');
+        }
+        setScraping(false);
+    };
 
     const fetchDoctors = async () => {
         try {
@@ -100,12 +120,31 @@ const AdminDoctors = () => {
                             <h1 className="text-2xl font-black text-gray-900 font-display tracking-tight">Doctor Management</h1>
                             <p className="text-sm font-bold text-gray-400 mt-0.5">View and manage all doctors on the platform</p>
                         </div>
-                        <div className="relative">
-                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
-                            <input type="text" placeholder="Search doctors..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary-200 w-64 transition-all" />
+                        <div className="flex items-center gap-3">
+                            <button onClick={() => setShowScraper(!showScraper)}
+                                className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all shadow-sm">
+                                <Database size={14} />
+                                Ingest from Directory
+                            </button>
+                            <div className="relative">
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
+                                <input type="text" placeholder="Search doctors..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary-200 w-64 transition-all" />
+                            </div>
                         </div>
                     </div>
+                    {showScraper && (
+                        <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-center gap-3">
+                            <Sparkles size={16} className="text-blue-600 flex-shrink-0" />
+                            <input type="url" value={scrapeUrl} onChange={(e) => setScrapeUrl(e.target.value)}
+                                placeholder="Paste a directory URL — or leave blank to use the built-in sample"
+                                className="flex-1 bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-blue-400" />
+                            <button onClick={handleScrape} disabled={scraping}
+                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all disabled:opacity-50">
+                                {scraping ? 'Ingesting...' : 'Run Scrape'}
+                            </button>
+                        </div>
+                    )}
                 </header>
 
                 <div className="p-8">
@@ -160,7 +199,7 @@ const AdminDoctors = () => {
                                         className="grid grid-cols-8 gap-3 px-6 py-4 items-center hover:bg-gray-50/30 transition-colors">
                                         <div className="col-span-2 flex items-center gap-3">
                                             {d.avatar ? (
-                                                <img src={d.avatar} alt={d.fullName} className="w-10 h-10 rounded-xl object-cover border border-white shadow-sm" />
+                                                <img src={resolveFileUrl(d.avatar)} alt={d.fullName} className="w-10 h-10 rounded-xl object-cover border border-white shadow-sm" />
                                             ) : (
                                                 <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-sm border border-white shadow-sm">{d.fullName?.[0] || 'D'}</div>
                                             )}

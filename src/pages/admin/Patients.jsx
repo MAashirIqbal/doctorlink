@@ -9,6 +9,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getAllUsers } from '../../api/adminAPI';
+import { resolveFileUrl } from '../../api/axios';
 
 const sidebarLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
@@ -147,7 +148,7 @@ const AdminPatients = () => {
                                     className="grid grid-cols-7 gap-4 px-6 py-4 items-center hover:bg-gray-50/30 transition-colors">
                                     <div className="col-span-2 flex items-center gap-3">
                                         {u.avatar ? (
-                                            <img src={u.avatar} alt={u.name} className="w-10 h-10 rounded-xl object-cover border border-white shadow-sm" />
+                                            <img src={resolveFileUrl(u.avatar)} alt={u.name} className="w-10 h-10 rounded-xl object-cover border border-white shadow-sm" />
                                         ) : (
                                             <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-black text-sm border border-white shadow-sm">{u.name?.[0] || 'P'}</div>
                                         )}

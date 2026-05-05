@@ -5,11 +5,12 @@ import {
     Calendar, Clock, User, Bell, Search, ArrowRight, Star,
     Activity, LogOut, Stethoscope, DollarSign,
     ChevronRight, TrendingUp, CalendarCheck, Users, CheckCircle2,
-    XCircle, AlertCircle, BarChart3, Wallet, ClipboardList
+    XCircle, AlertCircle, BarChart3, Wallet, ClipboardList, MessageCircle
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getDoctorDashboard, getMyEarnings, getDoctorReviews } from '../../api/doctorAPI';
+import { resolveFileUrl } from '../../api/axios';
 import { getDoctorAppointments, acceptAppointment, rejectAppointment } from '../../api/appointmentAPI';
 import NotificationDropdown from '../../components/NotificationDropdown';
 import AnnouncementBanner from '../../components/AnnouncementBanner';
@@ -18,6 +19,7 @@ const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard', active: true },
     { icon: Calendar, label: 'Appointments', path: '/doctor/appointments' },
     { icon: Users, label: 'My Patients', path: '/doctor/patients' },
+    { icon: MessageCircle, label: 'Messages', path: '/messages' },
     { icon: Wallet, label: 'Earnings', path: '/doctor/earnings' },
     { icon: ClipboardList, label: 'Schedule', path: '/doctor/schedule' },
     { icon: User, label: 'Profile', path: '/doctor/profile' },
@@ -117,7 +119,7 @@ const DoctorDashboard = () => {
                 <div className="p-4 border-t border-gray-50">
                     <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                            <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
                         ) : (
                             <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
                         )}
@@ -144,7 +146,7 @@ const DoctorDashboard = () => {
                         <div className="flex items-center gap-4">
                             <NotificationDropdown />
                             {user?.avatar ? (
-                                <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                                <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
                             ) : (
                                 <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
                             )}
@@ -209,7 +211,7 @@ const DoctorDashboard = () => {
                                                 </div>
                                                 <div className="w-px h-10 bg-gray-100" />
                                                 {apt.patient?.avatar ? (
-                                                    <img src={apt.patient.avatar} alt={apt.patient.name} className="w-11 h-11 rounded-xl object-cover border-2 border-white shadow-sm" />
+                                                    <img src={resolveFileUrl(apt.patient.avatar)} alt={apt.patient.name} className="w-11 h-11 rounded-xl object-cover border-2 border-white shadow-sm" />
                                                 ) : (
                                                     <div className="w-11 h-11 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-sm border-2 border-white shadow-sm">{apt.patient?.name?.[0] || 'P'}</div>
                                                 )}

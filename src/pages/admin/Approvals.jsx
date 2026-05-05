@@ -25,6 +25,59 @@ const sidebarLinks = [
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 
+const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const fileBase = apiBase.replace(/\/api\/?$/, '');
+const toFileUrl = (p) => (!p ? '' : (p.startsWith('http') ? p : `${fileBase}${p}`));
+const isImageDoc = (p) => /\.(png|jpe?g|webp|gif)$/i.test(p || '');
+
+const DocRow = ({ label, path }) => {
+    if (!path) {
+        return (
+            <div className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
+                        <FileText size={14} className="text-gray-400" />
+                    </div>
+                    <div>
+                        <p className="text-sm font-black text-gray-900">{label}</p>
+                        <p className="text-[10px] font-bold text-red-500">Not uploaded</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    const url = toFileUrl(path);
+    const filename = path.split('/').pop();
+    return (
+        <div className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="flex items-center gap-3 min-w-0">
+                {isImageDoc(path) ? (
+                    <a href={url} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 bg-white flex-shrink-0">
+                        <img src={url} alt={label} className="w-full h-full object-cover" />
+                    </a>
+                ) : (
+                    <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center border border-primary-100">
+                        <FileText size={14} className="text-primary-700" />
+                    </div>
+                )}
+                <div className="min-w-0">
+                    <p className="text-sm font-black text-gray-900">{label}</p>
+                    <p className="text-[10px] font-bold text-gray-400 truncate">{filename}</p>
+                </div>
+            </div>
+            <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-gray-100 text-gray-600 hover:text-primary-700 hover:border-primary-100 text-[11px] font-black transition-all"
+            >
+                <Eye size={12} />
+                View
+            </a>
+        </div>
+    );
+};
+
 const DetailModal = ({ doctor, onClose, onApprove, onReject }) => {
     if (!doctor) return null;
     return (
@@ -51,7 +104,7 @@ const DetailModal = ({ doctor, onClose, onApprove, onReject }) => {
                             </div>
                             <div>
                                 <h3 className="text-lg font-black text-gray-900 font-display">Application Review</h3>
-                                <p className="text-xs font-bold text-gray-400">Submitted {doctor.date}</p>
+                                <p className="text-xs font-bold text-gray-400">Submitted {doctor.createdAt ? new Date(doctor.createdAt).toLocaleDateString() : ''}</p>
                             </div>
                         </div>
                         <button onClick={onClose} className="p-2 bg-gray-50 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all">
@@ -106,22 +159,9 @@ const DetailModal = ({ doctor, onClose, onApprove, onReject }) => {
                         <div>
                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Uploaded Documents</p>
                             <div className="space-y-2">
-                                {(doctor.documents || []).map((doc, i) => (
-                                    <div key={i} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl border border-gray-100">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center border border-primary-100">
-                                                <FileText size={14} className="text-primary-700" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-black text-gray-900">{doc}</p>
-                                                <p className="text-[10px] font-bold text-gray-400">PDF • Uploaded {doctor.date}</p>
-                                            </div>
-                                        </div>
-                                        <button className="p-2 bg-white rounded-lg border border-gray-100 text-gray-400 hover:text-primary-700 hover:border-primary-100 transition-all">
-                                            <Download size={14} />
-                                        </button>
-                                    </div>
-                                ))}
+                                <DocRow label="PMC / PMDC License" path={doctor.documents?.pmcLicense} />
+                                <DocRow label="Degree Certificate" path={doctor.documents?.degreeCertificate} />
+                                <DocRow label="CNIC Copy" path={doctor.documents?.cnicCopy} />
                             </div>
                         </div>
                     </div>

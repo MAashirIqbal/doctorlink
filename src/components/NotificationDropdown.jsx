@@ -1,12 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, CheckCheck, Calendar, CreditCard, Info, X } from 'lucide-react';
+import { Bell, CheckCheck, Calendar, CreditCard, Info, X, MessageCircle, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { getMyNotifications, markAllNotificationsRead, markNotificationRead } from '../api/notificationAPI';
 
 const typeIcons = {
     appointment: Calendar,
     payment: CreditCard,
-    info: Info,
+    info: MessageCircle,
+    reminder: Clock,
+};
+
+// Map a notification to a route based on its meta + the recipient's role.
+const resolveRoute = (n, role) => {
+    const meta = n?.meta || {};
+    if (meta.appointmentId) {
+        if (role === 'doctor') return `/doctor/appointments/${meta.appointmentId}`;
+        if (role === 'admin') return `/admin/appointments/${meta.appointmentId}`;
+        return `/patient/appointments/${meta.appointmentId}`;
+    }
+    if (meta.messageId) return '/messages';
+    return null;
 };
 
 const NotificationDropdown = () => {
@@ -15,6 +30,8 @@ const NotificationDropdown = () => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(false);
     const ref = useRef(null);
+    const navigate = useNavigate();
+    const { user } = useAuth();
 
     const fetchNotifications = async () => {
         try {
@@ -63,6 +80,16 @@ const NotificationDropdown = () => {
             await fetchNotifications();
         } catch (e) {
             console.error(e);
+        }
+    };
+
+    const handleClickNotification = (n) => {
+        // Mark read in background (don't block navigation)
+        if (!n.isRead) markNotificationRead(n._id).then(fetchNotifications).catch(() => {});
+        const route = resolveRoute(n, user?.role);
+        if (route) {
+            setOpen(false);
+            navigate(route);
         }
     };
 
@@ -131,7 +158,7 @@ const NotificationDropdown = () => {
                                     return (
                                         <div
                                             key={n._id}
-                                            onClick={() => !n.isRead && handleMarkOneRead(n._id)}
+                                            onClick={() => handleClickNotification(n)}
                                             className={`flex items-start gap-3 px-5 py-4 border-b border-gray-50 transition-all cursor-pointer hover:bg-gray-50 ${!n.isRead ? 'bg-primary-50/30' : ''}`}
                                         >
                                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${!n.isRead ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-400'}`}>

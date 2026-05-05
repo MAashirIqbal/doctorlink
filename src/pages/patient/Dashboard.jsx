@@ -3,17 +3,20 @@ import { motion } from 'framer-motion';
 import {
     Calendar, Clock, User, Bell, Search, ArrowRight, Star,
     MapPin, Activity, Settings, LogOut,
-    ChevronRight, TrendingUp, CalendarCheck, AlertCircle, Stethoscope
+    ChevronRight, TrendingUp, CalendarCheck, AlertCircle, Stethoscope, Sparkles, MessageCircle
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getPatientDashboard, getMyAppointments } from '../../api/appointmentAPI';
+import { resolveFileUrl } from '../../api/axios';
 import NotificationDropdown from '../../components/NotificationDropdown';
 import AnnouncementBanner from '../../components/AnnouncementBanner';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/patient/dashboard', active: true },
     { icon: Calendar, label: 'My Appointments', path: '/patient/appointments' },
+    { icon: Sparkles, label: 'Symptom Analyzer', path: '/patient/symptom-analyzer' },
+    { icon: MessageCircle, label: 'Messages', path: '/messages' },
     { icon: Search, label: 'Find Doctors', path: '/doctors' },
     { icon: User, label: 'My Profile', path: '/patient/profile' },
 ];
@@ -100,7 +103,7 @@ const PatientDashboard = () => {
                 <div className="p-4 border-t border-gray-50">
                     <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                            <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
                         ) : (
                             <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">
                                 {user?.name?.[0] || 'P'}
@@ -195,7 +198,7 @@ const PatientDashboard = () => {
                                         >
                                             <div className="flex items-start gap-4">
                                                 {apt.doctor?.avatar ? (
-                                                    <img src={apt.doctor.avatar} alt={apt.doctor.fullName} className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm" />
+                                                    <img src={resolveFileUrl(apt.doctor.avatar)} alt={apt.doctor.fullName} className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm" />
                                                 ) : (
                                                     <div className="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-lg border-2 border-white shadow-sm">
                                                         {apt.doctor?.fullName?.[0] || 'D'}
@@ -276,7 +279,7 @@ const PatientDashboard = () => {
                             >
                                 <div className="relative inline-block mb-4">
                                     {user?.avatar ? (
-                                        <img src={user.avatar} alt={user?.name} className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg" />
+                                        <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg" />
                                     ) : (
                                         <div className="w-20 h-20 rounded-2xl bg-primary-700 flex items-center justify-center text-white font-black text-2xl border-4 border-white shadow-lg">
                                             {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
@@ -309,7 +312,7 @@ const PatientDashboard = () => {
                                     {recentDoctors.slice(0, 3).map((doc, i) => (
                                         <Link key={doc._id} to={`/doctors/${doc._id}`} className="flex items-center gap-3 p-4 hover:bg-primary-50/30 transition-colors">
                                             {doc.avatar ? (
-                                                <img src={doc.avatar} alt={doc.fullName} className="w-10 h-10 rounded-xl object-cover border border-white shadow-sm" />
+                                                <img src={resolveFileUrl(doc.avatar)} alt={doc.fullName} className="w-10 h-10 rounded-xl object-cover border border-white shadow-sm" />
                                             ) : (
                                                 <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-sm border border-white shadow-sm">
                                                     {doc.fullName?.[0] || 'D'}

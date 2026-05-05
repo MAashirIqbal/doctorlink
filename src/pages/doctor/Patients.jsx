@@ -3,16 +3,18 @@ import { motion } from 'framer-motion';
 import {
     Calendar, Clock, User, Search, Activity, LogOut,
     Users, Wallet, ClipboardList, Stethoscope, Phone, Mail,
-    ChevronRight, Eye, MapPin
+    ChevronRight, Eye, MapPin, MessageCircle
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getMyPatients } from '../../api/doctorAPI';
+import { resolveFileUrl } from '../../api/axios';
 
 const sidebarLinks = [
     { icon: Activity, label: 'Dashboard', path: '/doctor/dashboard' },
     { icon: Calendar, label: 'Appointments', path: '/doctor/appointments' },
     { icon: Users, label: 'My Patients', path: '/doctor/patients', active: true },
+    { icon: MessageCircle, label: 'Messages', path: '/messages' },
     { icon: Wallet, label: 'Earnings', path: '/doctor/earnings' },
     { icon: ClipboardList, label: 'Schedule', path: '/doctor/schedule' },
     { icon: User, label: 'Profile', path: '/doctor/profile' },
@@ -76,7 +78,7 @@ const DoctorPatients = () => {
                 <div className="p-4 border-t border-gray-50">
                     <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
+                            <img src={resolveFileUrl(user.avatar)} alt={user?.name} className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm" />
                         ) : (
                             <div className="w-10 h-10 rounded-xl bg-primary-700 flex items-center justify-center text-white font-black text-sm border-2 border-white shadow-sm">{user?.name?.[0]}</div>
                         )}
@@ -138,7 +140,7 @@ const DoctorPatients = () => {
                             >
                                 <div className="flex items-start gap-4 mb-5">
                                     {patient.avatar ? (
-                                        <img src={patient.avatar} alt={patient.name} className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-md" />
+                                        <img src={resolveFileUrl(patient.avatar)} alt={patient.name} className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-md" />
                                     ) : (
                                         <div className="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-700 font-black text-lg border-2 border-white shadow-md">{patient.name?.[0] || 'P'}</div>
                                     )}

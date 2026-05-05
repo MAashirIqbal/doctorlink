@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
+import ThemeToggle from './components/ThemeToggle';
 import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/public/Landing';
 import Auth from './pages/public/Auth';
@@ -17,6 +19,8 @@ import PatientAppointments from './pages/patient/Appointments';
 import AppointmentDetail from './pages/patient/AppointmentDetail';
 import BookAppointment from './pages/patient/BookAppointment';
 import PatientProfile from './pages/patient/Profile';
+import SymptomAnalyzer from './pages/patient/SymptomAnalyzer';
+import Messages from './pages/shared/Messages';
 import DoctorDashboard from './pages/doctor/Dashboard';
 import DoctorProfile from './pages/doctor/Profile';
 import DoctorAppointments from './pages/doctor/Appointments';
@@ -44,8 +48,10 @@ import AdminAnnouncements from './pages/admin/Announcements';
 function App() {
   return (
     <Router>
+      <ThemeProvider>
       <AuthProvider>
         <ToastProvider>
+        <ThemeToggle />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
@@ -65,6 +71,8 @@ function App() {
           <Route path="/patient/appointments" element={<ProtectedRoute roles={['patient']}><PatientAppointments /></ProtectedRoute>} />
           <Route path="/patient/appointments/:id" element={<ProtectedRoute roles={['patient']}><AppointmentDetail /></ProtectedRoute>} />
           <Route path="/patient/profile" element={<ProtectedRoute roles={['patient']}><PatientProfile /></ProtectedRoute>} />
+          <Route path="/patient/symptom-analyzer" element={<ProtectedRoute roles={['patient']}><SymptomAnalyzer /></ProtectedRoute>} />
+          <Route path="/messages" element={<ProtectedRoute roles={['patient', 'doctor']}><Messages /></ProtectedRoute>} />
           <Route path="/book-appointment/:id" element={<ProtectedRoute roles={['patient']}><BookAppointment /></ProtectedRoute>} />
 
           {/* Doctor Routes */}
@@ -95,6 +103,7 @@ function App() {
         </Routes>
         </ToastProvider>
       </AuthProvider>
+      </ThemeProvider>
     </Router>
   );
 }
