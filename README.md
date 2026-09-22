@@ -382,6 +382,20 @@ After deploying, set `CLIENT_URL` on the API to the web client's origin, and reg
 
 To point the published site at an API, set a repository variable named `VITE_API_URL` under **Settings → Secrets and variables → Actions → Variables**, then re-run the workflow. The backend's `CLIENT_URL` must include `https://<user>.github.io` or CORS will reject every request.
 
+#### Publishing without Actions
+
+The site currently deploys from the `gh-pages` branch rather than the workflow, because GitHub Actions is unavailable on this account. To publish an update by hand:
+
+```bash
+cd frontend
+VITE_BASE_PATH=/doctorlink/ VITE_API_URL=<api-url> npm run build
+cd dist && touch .nojekyll
+git init -b gh-pages && git add -A && git commit -m "Publish web client build"
+git push -f https://github.com/<user>/doctorlink.git gh-pages
+```
+
+To switch back to the workflow once Actions is available, set **Settings → Pages → Source** to *GitHub Actions*. The workflow file is already in place and needs no changes.
+
 ---
 
 ## Maintenance scripts
