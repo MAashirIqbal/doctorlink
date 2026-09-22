@@ -70,7 +70,7 @@ const Hero = () => {
                             {[
                                 { icon: Clock, label: 'Fast Access', val: '24/7' },
                                 { icon: ShieldCheck, label: 'Secure Data', val: '100%' },
-                                { icon: User, label: 'Verified', val: '5k+' },
+                                { icon: User, label: 'Verified', val: '6k+' },
                             ].map((stat, i) => (
                                 <div key={i} className="flex flex-col gap-1">
                                     <span className="text-2xl font-black text-gray-900 leading-none">{stat.val}</span>

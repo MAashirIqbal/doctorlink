@@ -11,7 +11,7 @@ import medicalImage from '../../assets/medical_tech.png';
 import consultationImage from '../../assets/consultation.png';
 
 const stats = [
-    { value: '5,000+', label: 'Verified Doctors', icon: Users },
+    { value: '6,000+', label: 'Verified Doctors', icon: Users },
     { value: '50,000+', label: 'Happy Patients', icon: Heart },
     { value: '99%', label: 'Satisfaction Rate', icon: Award },
     { value: '24/7', label: 'Platform Access', icon: Globe },
