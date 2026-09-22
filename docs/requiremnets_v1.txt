@@ -1,0 +1,248 @@
+1️⃣ Project Overview (High Level)
+
+The Doctor Link System is a full-stack, role-based healthcare appointment platform that enables:
+
+Patients to search doctors, book appointments, and make online payments
+
+Doctors to manage schedules, appointments, and earnings
+
+Admins to monitor, control, and manage the entire system
+
+The system is developed using modern full-stack web technologies following Object-Oriented principles and three-tier architecture, suitable for a Final Year Project.
+
+2️⃣ System Architecture Requirement
+🔹 Architecture Style
+
+Three-Tier Architecture
+
+Presentation Layer (Frontend)
+
+Application Layer (Backend APIs)
+
+Data Layer (Database & Storage)
+
+🔹 Communication
+
+RESTful APIs over HTTP/HTTPS
+
+JSON-based data exchange
+
+JWT-based authentication
+
+3️⃣ Frontend Requirements (Client Side)
+🔹 Technology Stack
+
+React.js – Component-based UI
+
+Vite – Fast development & build tool
+
+Tailwind CSS – Responsive UI styling
+
+React Router – Client-side routing
+
+Axios – API communication
+
+React Toastify – Notifications
+
+🔹 Frontend Functional Requirements
+
+The frontend must provide separate user experiences based on roles:
+
+Patient Interface
+
+Authentication (Login / Register)
+
+Doctor search & filtering
+
+Doctor profile viewing
+
+Appointment booking UI
+
+Payment UI (Stripe)
+
+Appointment history
+
+Ratings & reviews
+
+Profile management
+
+Doctor Interface
+
+Secure login
+
+Doctor dashboard
+
+Availability & schedule management
+
+Appointment management
+
+Earnings overview
+
+Profile update
+
+Admin Interface
+
+Admin dashboard
+
+Doctor approval system
+
+User management
+
+Appointment monitoring
+
+Reports & statistics
+
+4️⃣ Backend Requirements (Server Side)
+🔹 Technology Stack
+
+Node.js – Runtime environment
+
+Express.js – Web framework
+
+JWT – Authentication & authorization
+
+Mongoose – MongoDB ODM
+
+Bcrypt – Password encryption
+
+Multer – File upload handling
+
+🔹 Backend Functional Requirements
+
+The backend must:
+
+Handle user authentication & authorization
+
+Implement role-based access control (RBAC)
+
+Provide REST APIs for all frontend operations
+
+Validate and process appointments
+
+Integrate payment gateway
+
+Handle cancellations & refunds
+
+Ensure secure data handling
+
+🔹 API Categories
+
+Auth APIs
+
+User APIs
+
+Doctor APIs
+
+Appointment APIs
+
+Payment APIs
+
+Review APIs
+
+Admin APIs
+
+5️⃣ Database Requirements
+🔹 Technology
+
+MongoDB (NoSQL)
+
+MongoDB Atlas / Compass
+
+🔹 Data Models (High Level)
+
+User (Patient / Doctor / Admin)
+
+Doctor Profile
+
+Appointment
+
+Payment
+
+Review & Rating
+
+🔹 Database Responsibilities
+
+Secure storage of user data
+
+Relationship mapping between doctors and patients
+
+Appointment lifecycle tracking
+
+Payment record storage
+
+6️⃣ Payment & Third-Party Integration
+🔹 Payment Gateway
+
+Stripe
+
+Appointment payment
+
+Payment verification
+
+Refund handling
+
+🔹 Media Storage
+
+Cloudinary
+
+Doctor profile images
+
+Uploaded documents
+
+7️⃣ Optional Intelligent Features (FYP-Acceptable)
+🔹 AI-Based Symptom Analyzer
+
+Basic NLP or rule-based logic
+
+Suggests possible specialization (not diagnosis)
+
+🔹 Recommendation System
+
+Suggest doctors based on:
+
+Ratings
+
+Specialization
+
+Appointment history
+
+🔹 Web Scraping
+
+Use Cheerio / Puppeteer
+
+Collect sample doctor data from public directories
+
+⚠️ These features should be supporting modules, not the core.
+
+8️⃣ Security & Reliability Requirements
+
+JWT authentication
+
+Password hashing (bcrypt)
+
+Role-based route protection
+
+HTTPS (deployment level)
+
+Environment variables for secrets
+
+Input validation & error handling
+
+9️⃣ Testing & Quality Requirements
+🔹 Tools
+
+Postman (API testing)
+
+Manual UI testing
+
+Optional: Jest / Mocha
+
+🔹 Testing Scope
+
+Authentication flows
+
+Appointment booking
+
+Payment flow
+
+Role access validation
