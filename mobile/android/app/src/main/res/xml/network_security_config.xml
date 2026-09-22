@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Allow cleartext HTTP only for local development hosts. HTTPS still works
+  for the Vercel production URL automatically. Add or remove LAN IPs here
+  if you demo on a physical device over Wi-Fi.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <!-- Common LAN ranges -->
+        <domain includeSubdomains="true">192.168.0.0</domain>
+        <domain includeSubdomains="true">192.168.1.1</domain>
+    </domain-config>
+</network-security-config>
