@@ -1,5 +1,5 @@
 name: doctorlink
-description: "A new Flutter project."
+description: "DoctorLink mobile client — book appointments, manage schedules and message your doctor."
 
 publish_to: 'none' 
 version: 1.0.0+1
