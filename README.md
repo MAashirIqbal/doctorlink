@@ -4,6 +4,10 @@ A doctor appointment and clinic management platform. Patients find a verified do
 
 The project ships three clients against one REST API: a React web app, a Flutter mobile app, and an admin portal that lives inside the web app.
 
+**Live preview:** [sumail-000.github.io/doctorlink](https://sumail-000.github.io/doctorlink/)
+
+The preview is the web client only. GitHub Pages serves static files, so it cannot run the API — the interface renders, but anything that needs data (sign-in, doctor search, booking) will fail until `VITE_API_URL` points at a deployed backend. See [Deployment](#deployment) for how to connect one.
+
 ---
 
 ## Contents
@@ -368,6 +372,15 @@ Both halves deploy to Vercel and each carries its own `vercel.json`.
 **Web client** — a static Vite build with an SPA rewrite so client-side routes resolve on refresh. Set `VITE_API_URL` to the deployed API.
 
 After deploying, set `CLIENT_URL` on the API to the web client's origin, and register the deployed webhook URL in the Stripe dashboard.
+
+### GitHub Pages
+
+`.github/workflows/deploy-frontend.yml` builds `frontend/` and publishes it to Pages on every push to `main` that touches that folder. Two details make a single-page app work on Pages:
+
+- **Base path.** Pages serves a project site from `/<repo>/`, not the domain root, so the workflow sets `VITE_BASE_PATH` and `vite.config.js` picks it up. React Router reads the same value through `import.meta.env.BASE_URL`, so no route needs to hard-code the prefix.
+- **Deep links.** Pages has no rewrite rules, so requesting `/doctorlink/doctors/123` directly returns its 404 page. `public/404.html` encodes the route into a query string and redirects to the app root, where a snippet in `index.html` restores it before React Router mounts. On a user page or custom domain served from the root, change `pathSegmentsToKeep` in `404.html` from `1` to `0`.
+
+To point the published site at an API, set a repository variable named `VITE_API_URL` under **Settings → Secrets and variables → Actions → Variables**, then re-run the workflow. The backend's `CLIENT_URL` must include `https://<user>.github.io` or CORS will reject every request.
 
 ---
 
