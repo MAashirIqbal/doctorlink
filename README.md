@@ -412,4 +412,4 @@ npm run seed                                # load sample data
 
 ## About
 
-Final-year project. Built and maintained by [sumail-000](https://github.com/sumail-000).
+Live preview: [maashiriqbal.github.io/doctorlink/](https://github.io)
