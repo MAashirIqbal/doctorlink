@@ -4,7 +4,7 @@ A doctor appointment and clinic management platform. Patients find a verified do
 
 The project ships three clients against one REST API: a React web app, a Flutter mobile app, and an admin portal that lives inside the web app.
 
-**Live preview:** [sumail-000.github.io/doctorlink](https://sumail-000.github.io/doctorlink/)
+**Live preview:** [maashiriqbal.github.io/doctorlink/](https://maashiriqbal.github.io/doctorlink/)
 
 The preview is the web client only. GitHub Pages serves static files, so it cannot run the API — the interface renders, but anything that needs data (sign-in, doctor search, booking) will fail until `VITE_API_URL` points at a deployed backend. See [Deployment](#deployment) for how to connect one.
 
